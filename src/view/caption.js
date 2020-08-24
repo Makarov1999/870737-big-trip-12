@@ -1,16 +1,18 @@
 import {createElement} from "../util.js";
-const createDayListTemplate = () => {
+const createCaptionTemplate = (text) => {
   return (
-    `<ul class="trip-days"><//ul>`
+    `<h2 class="visually-hidden">${text}</h2>`
   );
 };
 
-export default class DayListView {
-  constructor() {
+export default class CaptionView {
+  constructor(text) {
     this._element = null;
+    this._text = text;
   }
+
   getTemplate() {
-    return createDayListTemplate();
+    return createCaptionTemplate();
   }
 
   getElement() {

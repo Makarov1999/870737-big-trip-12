@@ -1,3 +1,20 @@
+export const createElement = (template) => {
+  const element = document.createElement(`div`);
+  element.innerHTML = template;
+  return element.firstChild;
+};
+
+export const render = (container, element, position) => {
+  switch (position) {
+    case `afterbegin`:
+      container.prepend(element);
+      break;
+    case `beforeend`:
+      container.append(element);
+      break;
+  }
+};
+
 export const getRandomIntNumber = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -120,4 +137,15 @@ export const setDateToForm = (date) => {
   const options = {year: `2-digit`, month: `2-digit`, day: `numeric`, hour: `2-digit`, minute: `2-digit`, hour12: false};
   const resultDate = date.toLocaleString(`en-GB`, options).replace(`,`, ``);
   return resultDate;
+};
+
+export const countTripCost = (routePoints) => {
+  const cost = routePoints.reduce((accumulator, routePoint) => {
+    return accumulator + routePoint.cost;
+  }, 0);
+  return cost;
+};
+
+export const renderElement = (parent, template, position) => {
+  parent.insertAdjacentHTML(position, template);
 };
