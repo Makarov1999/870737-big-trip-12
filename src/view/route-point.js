@@ -1,4 +1,4 @@
-import {getDifferenseInDates, getDuration} from "../util.js";
+import {getDifferenseInDates, getDuration, createElement} from "../util.js";
 import {createOfferTemplate} from "./offer.js";
 export const createRoutePointTemplate = (routePoint) => {
   const symbolDateStart = 0;
@@ -48,3 +48,25 @@ export const createRoutePointTemplate = (routePoint) => {
     </li>`
   );
 };
+
+export default class RoutePointView {
+  constructor(routePoint) {
+    this._element = null;
+    this._routePoint = routePoint;
+  }
+
+  getTemplate() {
+    return createRoutePointTemplate(this._routePoint);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

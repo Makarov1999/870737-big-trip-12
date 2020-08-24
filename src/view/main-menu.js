@@ -1,4 +1,5 @@
-export const createMainMenuTemplate = () => {
+import {createElement} from "../util.js";
+const createMainMenuTemplate = () => {
   return (
     `<nav class="trip-controls__trip-tabs  trip-tabs">
       <a class="trip-tabs__btn  trip-tabs__btn--active" href="#">Table</a>
@@ -6,3 +7,25 @@ export const createMainMenuTemplate = () => {
     </nav>`
   );
 };
+
+export default class MainMenuView {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMainMenuTemplate();
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+
+}

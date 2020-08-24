@@ -1,3 +1,13 @@
+export const ELEMENTS_POSITIONS = {
+  AFTERBEGIN: `afterbegin`,
+  BEFOREEND: `beforeend`
+};
+export const CAPTIONS_TEXT = {
+  TRIP_VIEW: `Switch trip view`,
+  FILTER: `Filter events`,
+  EVENT: `Trip events`
+};
+
 export const ROUTE_POINT_TYPES = [
   `Taxi`,
   `Bus`,

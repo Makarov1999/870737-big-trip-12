@@ -1,6 +1,6 @@
 import {ROUTE_POINT_TYPES_FORM} from "../const.js";
 import {ROUTE_POINT_GROUPS} from "../const.js";
-import {setDateToForm} from "../util.js";
+import {setDateToForm, createElement} from "../util.js";
 
 const createCitiesFormItems = (cities) => {
   let citiesFormTemlate = ``;
@@ -184,6 +184,31 @@ export const createFormMarksRouteTemplate = (cities, routePoint) => {
         <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
     </form>`);
-
   }
 };
+export default class FormView {
+  constructor(cities, routePoint) {
+    this._element = null;
+    this._cities = cities;
+    if (routePoint) {
+      this._routePoint = routePoint;
+    } else {
+      this._routePoint = null;
+    }
+  }
+
+  getTemplate() {
+    return createFormMarksRouteTemplate(this._cities, this._routePoint);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
