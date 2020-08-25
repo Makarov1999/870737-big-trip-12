@@ -9,10 +9,10 @@ import DayView from "./view/day.js";
 import CaptionView from "./view/caption.js";
 import RoutePointListView from "./view/route-point-list.js";
 import NoRoutePointView from "./view/no-route-points.js";
-
 import {generateRoutePoints} from "./mock/route-point.js";
 import {CITIES, ELEMENTS_POSITIONS, CAPTIONS_TEXT} from "./const.js";
 import {render, countTripCost} from "./util.js";
+
 const routePoints = generateRoutePoints(15);
 const route = `Amsterdam &mdash; Geneva`;
 const tripCost = countTripCost(routePoints) ? countTripCost(routePoints) : 0;
