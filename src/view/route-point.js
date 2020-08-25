@@ -8,8 +8,8 @@ export const createRoutePointTemplate = (routePoint) => {
   const prepos = (type === `Check` || type === `Restaurant` || type === `Sightseeing`) ? `in` : `to`;
   const startDate = startTime.toISOString().slice(symbolDateStart, symbolDateStop);
   const finishDate = finishTime.toISOString().slice(symbolDateStart, symbolDateStop);
-  const routePointTimeStart = startDate.slice(-5);
-  const routePointTimeStop = finishDate.slice(-5);
+  const routePointTimeStart = startTime.toLocaleString(`ru-RU`, {hour: `numeric`, minute: `numeric`});
+  const routePointTimeStop = finishTime.toLocaleString(`ru-RU`, {hour: `numeric`, minute: `numeric`});
   const duration = getDuration(getDifferenseInDates(startTime, finishTime));
   let offersTemplate = ``;
   offers.forEach((offer) => {
