@@ -8,15 +8,16 @@ import DayListView from "./view/day-list.js";
 import DayView from "./view/day.js";
 import CaptionView from "./view/caption.js";
 import RoutePointListView from "./view/route-point-list.js";
-
+import NoRoutePointView from "./view/no-route-points.js";
 import {generateRoutePoints} from "./mock/route-point.js";
 import {CITIES, ELEMENTS_POSITIONS, CAPTIONS_TEXT} from "./const.js";
 import {render, countTripCost} from "./util.js";
+
 const routePoints = generateRoutePoints(15);
 const route = `Amsterdam &mdash; Geneva`;
-const tripCost = countTripCost(routePoints);
-const tripStart = routePoints[0].startTime;
-const tripFinish = routePoints[routePoints.length - 1].finishTime;
+const tripCost = countTripCost(routePoints) ? countTripCost(routePoints) : 0;
+const tripStart = routePoints[0] ? routePoints[0].startTime : new Date();
+const tripFinish = routePoints[routePoints.length - 1] ? routePoints[routePoints.length - 1].finishTime : new Date();
 const mainTripBlock = document.querySelector(`.trip-main`);
 const mainTripFilterContainer = mainTripBlock.querySelector(`.trip-controls`);
 const eventsTripContainer = document.querySelector(`.trip-events`);
@@ -27,17 +28,23 @@ render(mainTripFilterContainer, new MainMenuView().getElement(), ELEMENTS_POSITI
 render(mainTripFilterContainer, new CaptionView(CAPTIONS_TEXT.FILTER).getElement(), ELEMENTS_POSITIONS.BEFOREEND);
 render(mainTripFilterContainer, new FilterView().getElement(), ELEMENTS_POSITIONS.BEFOREEND);
 render(eventsTripContainer, new CaptionView(CAPTIONS_TEXT.EVENT).getElement(), ELEMENTS_POSITIONS.AFTERBEGIN);
-render(eventsTripContainer, new SortView().getElement(), ELEMENTS_POSITIONS.BEFOREEND);
-const dayList = new DayListView();
-render(eventsTripContainer, dayList.getElement(), ELEMENTS_POSITIONS.BEFOREEND);
+
 const renderRoutePoint = (container, routePoint) => {
   const routePointComponent = new RoutePointView(routePoint);
   const routePointFormComponent = new FormView(CITIES, routePoint);
+  const onFormEscPress = (evt) => {
+    if (evt.key === `Escape` || evt.key === `Esc`) {
+      evt.preventDefault();
+      replaceFormToRoutePoint();
+    }
+  };
   const replaceRoutePointToForm = () => {
     container.replaceChild(routePointFormComponent.getElement(), routePointComponent.getElement());
+    document.addEventListener(`keydown`, onFormEscPress);
   };
   const replaceFormToRoutePoint = () => {
     container.replaceChild(routePointComponent.getElement(), routePointFormComponent.getElement());
+    document.removeEventListener(`keydown`, onFormEscPress);
   };
   render(container, routePointComponent.getElement(), ELEMENTS_POSITIONS.BEFOREEND);
   routePointComponent.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, replaceRoutePointToForm);
@@ -46,21 +53,29 @@ const renderRoutePoint = (container, routePoint) => {
 };
 const renderRoutePointsByDays = (daysContainer, events) => {
   if (events.length > 0) {
-    let currentDay = events[0].startTime.getDate();
+    let currentDay = events[0].startTime;
     let daysIterator = 1;
+    let dayElement = new DayView(currentDay, daysIterator).getElement();
     let eventList = new RoutePointListView().getElement();
     for (let i = 0; i < routePoints.length; i++) {
-      if (routePoints[i].startTime.getDate() !== currentDay || i === events.length - 1) {
-        let dayElement = new DayView(events[i - 1].startTime, daysIterator).getElement();
-        render(dayElement, eventList, ELEMENTS_POSITIONS.BEFOREEND);
-        render(daysContainer, dayElement, ELEMENTS_POSITIONS.BEFOREEND);
+      if (routePoints[i].startTime.getDate() !== currentDay.getDate()) {
         daysIterator++;
-        currentDay = events[i].startTime.getDate();
+        currentDay = events[i].startTime;
+        dayElement = new DayView(currentDay, daysIterator).getElement();
         eventList = new RoutePointListView().getElement();
       }
+      render(dayElement, eventList, ELEMENTS_POSITIONS.BEFOREEND);
+      render(daysContainer, dayElement, ELEMENTS_POSITIONS.BEFOREEND);
       renderRoutePoint(eventList, events[i]);
     }
   }
 };
-const daysList = eventsTripContainer.querySelector(`.trip-days`);
-renderRoutePointsByDays(daysList, routePoints);
+
+if (routePoints.length > 0) {
+  render(eventsTripContainer, new SortView().getElement(), ELEMENTS_POSITIONS.BEFOREEND);
+  const daysList = new DayListView().getElement();
+  renderRoutePointsByDays(daysList, routePoints);
+  render(eventsTripContainer, daysList, ELEMENTS_POSITIONS.BEFOREEND);
+} else {
+  render(eventsTripContainer, new NoRoutePointView().getElement(), ELEMENTS_POSITIONS.BEFOREEND);
+}
