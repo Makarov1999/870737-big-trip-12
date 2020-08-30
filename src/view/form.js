@@ -1,6 +1,7 @@
 import {ROUTE_POINT_TYPES_FORM} from "../const.js";
 import {ROUTE_POINT_GROUPS} from "../const.js";
-import {setDateToForm, createElement} from "../util.js";
+import {createElement} from "../utils/common.js";
+import {setDateToForm} from "../utils/date.js";
 
 const createCitiesFormItems = (cities) => {
   let citiesFormTemlate = ``;
@@ -14,7 +15,7 @@ const createOffersFormTemplate = (offers) => {
   let offersTemplate = ``;
   offers.forEach((offer) => {
     offersTemplate += ` <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name.toLowerCase()}-1" type="checkbox" name="event-offer-luggage" checked>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name.toLowerCase()}-1" type="checkbox" name="event-offer-luggage" ${offer.isChecked ? `checked` : ``}>
         <label class="event__offer-label" for="event-offer-${offer.name.toLowerCase()}-1">
           <span class="event__offer-title">${offer.name}</span>
           &plus;
@@ -117,7 +118,7 @@ export const createFormMarksRouteTemplate = (cities, routePoint) => {
             <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
             <div class="event__available-offers">
-            ${createOffersFormTemplate(offers)}
+
 
             </div>
           </section>

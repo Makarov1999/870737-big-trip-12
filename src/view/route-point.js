@@ -1,5 +1,14 @@
-import {getDifferenseInDates, getDuration, createElement} from "../util.js";
-import {createOfferTemplate} from "./offer.js";
+import {getDifferenseInDates, getDuration} from "../utils/date.js";
+import {createElement} from "../utils/common.js";
+const createOfferTemplate = (offer) => {
+  return (
+    `<li class="event__offer">
+      <span class="event__offer-title">${offer.name}</span>
+      &plus;
+      &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
+     </li>`
+  );
+};
 export const createRoutePointTemplate = (routePoint) => {
   const symbolDateStart = 0;
   const symbolDateStop = 16;
@@ -13,8 +22,10 @@ export const createRoutePointTemplate = (routePoint) => {
   const duration = getDuration(getDifferenseInDates(startTime, finishTime));
   let offersTemplate = ``;
   offers.forEach((offer) => {
-    const offerElement = createOfferTemplate(offer);
-    offersTemplate += offerElement;
+    if (offer.isChecked) {
+      const offerElement = createOfferTemplate(offer);
+      offersTemplate += offerElement;
+    }
   });
   return (
     `<li class="trip-events__item">

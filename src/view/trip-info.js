@@ -1,4 +1,5 @@
-import {prepareDateToDay, createElement} from "../util.js";
+import {prepareDateToDay} from "../utils/date.js";
+import AbstractView from "./abstract.js";
 const createTripInfoTemplate = (route, cost, startDate, finishDate) => {
   return (
     `<section class="trip-main__trip-info  trip-info">
@@ -15,9 +16,9 @@ const createTripInfoTemplate = (route, cost, startDate, finishDate) => {
   );
 };
 
-export default class TripView {
+export default class TripInfoView extends AbstractView {
   constructor(route, cost, startDate, finishDate) {
-    this._element = null;
+    super();
     this._route = route;
     this._cost = cost;
     this._startDate = startDate;
@@ -26,16 +27,5 @@ export default class TripView {
 
   getTemplate() {
     return createTripInfoTemplate(this._route, this._cost, this._startDate, this._finishDate);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

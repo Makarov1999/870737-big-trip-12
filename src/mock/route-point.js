@@ -1,25 +1,6 @@
-import {getRandomIntNumber, getRandomElementFromArr} from "../util.js";
-import {ROUTE_POINT_TYPES, DESCRIPTIONS_TO_ROUTE_POINT, CITIES, FLIGHT_OFFERS, TAXI_OFFERS, TRAIN_OFFERS, SHIP_OFFERS} from "../const.js";
-
-const setOffer = (routePointType) => {
-  let offers = [];
-  switch (routePointType) {
-    case `Flight`:
-      offers = FLIGHT_OFFERS.slice();
-      break;
-    case `Taxi`:
-      offers = TAXI_OFFERS.slice();
-      break;
-    case `Train`:
-      offers = TRAIN_OFFERS.slice();
-      break;
-    case `Ship`:
-      offers = SHIP_OFFERS.slice();
-      break;
-    default: offers = [];
-  }
-  return offers;
-};
+import {getRandomIntNumber, getRandomElementFromArr} from "../utils/rand.js";
+import {ROUTE_POINT_TYPES, DESCRIPTIONS_TO_ROUTE_POINT, CITIES} from "../const.js";
+import {setOffers} from "./offer.js";
 
 const getDescription = (minSentencesCount = 1, maxSentencesCount = 5, sentences) => {
   const sentencesCount = getRandomIntNumber(minSentencesCount, maxSentencesCount);
@@ -51,7 +32,7 @@ export const generateRoutePoint = (previousTimeFinish) => {
   const type = getRandomElementFromArr(ROUTE_POINT_TYPES);
   const city = getRandomElementFromArr(CITIES);
   const description = getDescription(1, 5, DESCRIPTIONS_TO_ROUTE_POINT);
-  const offers = setOffer(type);
+  const offers = setOffers(type);
   const startTime = previousTimeFinish;
   const finishTime = getFinishDate(startTime);
   const photos = generatePhotosPlug();

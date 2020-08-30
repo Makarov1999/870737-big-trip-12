@@ -9,9 +9,11 @@ import DayView from "./view/day.js";
 import CaptionView from "./view/caption.js";
 import RoutePointListView from "./view/route-point-list.js";
 import NoRoutePointView from "./view/no-route-points.js";
+import OfferView from "./view/offer.js";
 import {generateRoutePoints} from "./mock/route-point.js";
 import {CITIES, ELEMENTS_POSITIONS, CAPTIONS_TEXT} from "./const.js";
-import {render, countTripCost} from "./util.js";
+import {countTripCost} from "./utils/common.js";
+import {render} from "./utils/render.js";
 
 const routePoints = generateRoutePoints(15);
 const route = `Amsterdam &mdash; Geneva`;
@@ -32,6 +34,13 @@ render(eventsTripContainer, new CaptionView(CAPTIONS_TEXT.EVENT).getElement(), E
 const renderRoutePoint = (container, routePoint) => {
   const routePointComponent = new RoutePointView(routePoint);
   const routePointFormComponent = new FormView(CITIES, routePoint);
+  const formOffers = routePoint.offers;
+  const offersFormContainer = routePointFormComponent.getElement().querySelector(`.event__available-offers`);
+  formOffers.forEach((offer) => {
+    const offerFormComponent = new OfferView(offer);
+    render(offersFormContainer, offerFormComponent, ELEMENTS_POSITIONS.BEFOREEND);
+  });
+
   const onFormEscPress = (evt) => {
     if (evt.key === `Escape` || evt.key === `Esc`) {
       evt.preventDefault();
