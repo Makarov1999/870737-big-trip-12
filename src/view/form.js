@@ -2,28 +2,15 @@ import {ROUTE_POINT_TYPES_FORM} from "../const.js";
 import {ROUTE_POINT_GROUPS} from "../const.js";
 import {createElement} from "../utils/common.js";
 import {setDateToForm} from "../utils/date.js";
-
+import {render} from "../utils/render.js";
+import AbstractView from "./abstract.js";
+import OfferView from "../view/offer.js";
 const createCitiesFormItems = (cities) => {
   let citiesFormTemlate = ``;
   cities.forEach((city) => {
     citiesFormTemlate += `<option value="${city}"></option>`;
   });
   return citiesFormTemlate;
-};
-
-const createOffersFormTemplate = (offers) => {
-  let offersTemplate = ``;
-  offers.forEach((offer) => {
-    offersTemplate += ` <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name.toLowerCase()}-1" type="checkbox" name="event-offer-luggage" ${offer.isChecked ? `checked` : ``}>
-        <label class="event__offer-label" for="event-offer-${offer.name.toLowerCase()}-1">
-          <span class="event__offer-title">${offer.name}</span>
-          &plus;
-          &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
-        </label>
-      </div>`;
-  });
-  return offersTemplate;
 };
 
 const createPhotosFormTemplate = (photos) => {
@@ -63,7 +50,7 @@ const createGroupsOfEventsFormTypeTemlate = (groups, checkedEvent = `Flight`) =>
 
 export const createFormMarksRouteTemplate = (cities, routePoint) => {
   if (routePoint) {
-    const {type, city, info, offers, startTime, finishTime, cost} = routePoint;
+    const {type, city, info, startTime, finishTime, cost} = routePoint;
     const prepos = (type === `Check-in` || type === `Restaurant` || type === `Sightseeing`) ? `in` : `to`;
     return (
       `<form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -187,12 +174,14 @@ export const createFormMarksRouteTemplate = (cities, routePoint) => {
     </form>`);
   }
 };
-export default class FormView {
+export default class FormView extends AbstractView {
   constructor(cities, routePoint) {
-    this._element = null;
+    super();
     this._cities = cities;
+    this._submitHandler = this._submitHandler.bind(this);
     if (routePoint) {
       this._routePoint = routePoint;
+      this._offers = routePoint.offers;
     } else {
       this._routePoint = null;
     }
@@ -205,11 +194,22 @@ export default class FormView {
   getElement() {
     if (!this._element) {
       this._element = createElement(this.getTemplate());
+      if (this._routePoint) {
+        const offersFormContainer = this._element.querySelector(`.event__available-offers`);
+        this._offers.forEach((offer) => {
+          const offerFormComponent = new OfferView(offer);
+          render(offersFormContainer, offerFormComponent, `beforeend`);
+        });
+      }
     }
     return this._element;
   }
-
-  removeElement() {
-    this._element = null;
+  _submitHandler(evt) {
+    evt.preventDefault();
+    this._callback.submit();
+  }
+  setSubmitHandler(callBack) {
+    this._callback.submit = callBack;
+    this.getElement().addEventListener(`submit`, this._submitHandler);
   }
 }

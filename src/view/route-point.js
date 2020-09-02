@@ -1,5 +1,6 @@
 import {getDifferenseInDates, getDuration} from "../utils/date.js";
-import {createElement} from "../utils/common.js";
+import AbstractView from "./abstract.js";
+
 const createOfferTemplate = (offer) => {
   return (
     `<li class="event__offer">
@@ -60,24 +61,23 @@ export const createRoutePointTemplate = (routePoint) => {
   );
 };
 
-export default class RoutePointView {
+export default class RoutePointView extends AbstractView {
   constructor(routePoint) {
-    this._element = null;
+    super();
     this._routePoint = routePoint;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createRoutePointTemplate(this._routePoint);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
   }
+  setClickHandler(callBack) {
+    this._callback.click = callBack;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
 
-  removeElement() {
-    this._element = null;
   }
 }

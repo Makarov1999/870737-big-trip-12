@@ -1,12 +1,18 @@
 import {prepareDateToDay} from "../utils/date.js";
 import AbstractView from "./abstract.js";
 const createTripInfoTemplate = (route, cost, startDate, finishDate) => {
+  let dateExpression;
+  if (startDate === `` && finishDate === ``) {
+    dateExpression = ``;
+  } else {
+    dateExpression = `${prepareDateToDay(startDate)}&nbsp;&mdash;&nbsp;${prepareDateToDay(finishDate)}`;
+  }
   return (
     `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
         <h1 class="trip-info__title">${route}</h1>
 
-        <p class="trip-info__dates">${prepareDateToDay(startDate)}&nbsp;&mdash;&nbsp;${prepareDateToDay(finishDate)}</p>
+        <p class="trip-info__dates">${dateExpression}</p>
       </div>
 
       <p class="trip-info__cost">
