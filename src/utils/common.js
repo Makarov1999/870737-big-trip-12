@@ -21,18 +21,10 @@ export const countRoute = (routePoints) => {
   });
   const citiesCount = differentCities.length;
   let route = ``;
-  switch (citiesCount) {
-    case 1:
-      route = differentCities[0];
-      break;
-    case 2:
-      route = `${differentCities[0]} &mdash; ${differentCities[1]}`;
-      break;
-    case 3:
-      route = `${differentCities[0]} &mdash; ${differentCities[1]} &mdash; ${differentCities[2]}`;
-      break;
-    default:
-      route = `${differentCities[0]} &mdash; ... &mdash; ${differentCities[citiesCount - 1]}`;
+  if (differentCities.length < 4) {
+    route = differentCities.slice().join(`&mdash;`);
+  } else {
+    route = `${differentCities[0]} &mdash;...&mdash; ${differentCities[citiesCount - 1]}`;
   }
   return route;
 };

@@ -2,7 +2,7 @@ import AbstractView from "./abstract.js";
 export const createOfferFormTemplate = (offer) => {
   return (
     `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name.toLowerCase()}-1" type="checkbox" name="event-offer-luggage" ${offer.isChecked ? `checked` : ``}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.name.toLowerCase()}-1" type="checkbox" name="event-offer-${offer.name.toLowerCase()}" ${offer.isChecked ? `checked` : ``}>
         <label class="event__offer-label" for="event-offer-${offer.name.toLowerCase()}-1">
           <span class="event__offer-title">${offer.name}</span>
           &plus;

@@ -61,50 +61,13 @@ export const getDuration = (duration) => {
 };
 
 export const prepareDateToDay = (date) => {
+  const MONTHS = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
   if (!(date instanceof Date)) {
     return ``;
   } else {
     const month = date.getMonth();
-    let dateExpression = ``;
-    switch (month) {
-      case 0:
-        dateExpression += `JAN `;
-        break;
-      case 1:
-        dateExpression += `FEB `;
-        break;
-      case 2:
-        dateExpression += `MAR `;
-        break;
-      case 3:
-        dateExpression += `APR `;
-        break;
-      case 4:
-        dateExpression += `MAY `;
-        break;
-      case 5:
-        dateExpression += `JUN `;
-        break;
-      case 6:
-        dateExpression += `JUL`;
-        break;
-      case 7:
-        dateExpression += `AUG`;
-        break;
-      case 8:
-        dateExpression += `SEP`;
-        break;
-      case 9:
-        dateExpression += `OCT`;
-        break;
-      case 10:
-        dateExpression += `NOV`;
-        break;
-      case 11:
-        dateExpression += `DEC`;
-        break;
-    }
-    return (dateExpression += date.getDate());
+    const dateExpression = MONTHS[month] + ` ` + date.getDate();
+    return dateExpression;
   }
 };
 
