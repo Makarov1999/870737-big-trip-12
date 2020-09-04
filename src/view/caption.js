@@ -1,28 +1,17 @@
-import {createElement} from "../util.js";
+import AbstractView from "./abstract.js";
 const createCaptionTemplate = (text) => {
   return (
     `<h2 class="visually-hidden">${text}</h2>`
   );
 };
 
-export default class CaptionView {
+export default class CaptionView extends AbstractView {
   constructor(text) {
-    this._element = null;
+    super();
     this._text = text;
   }
 
   getTemplate() {
-    return createCaptionTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    return createCaptionTemplate(this._text);
   }
 }

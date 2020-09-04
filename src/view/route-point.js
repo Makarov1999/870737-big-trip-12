@@ -1,5 +1,15 @@
-import {getDifferenseInDates, getDuration, createElement} from "../util.js";
-import {createOfferTemplate} from "./offer.js";
+import {getDifferenseInDates, getDuration} from "../utils/date.js";
+import AbstractView from "./abstract.js";
+
+const createOfferTemplate = (offer) => {
+  return (
+    `<li class="event__offer">
+      <span class="event__offer-title">${offer.name}</span>
+      &plus;
+      &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
+     </li>`
+  );
+};
 export const createRoutePointTemplate = (routePoint) => {
   const symbolDateStart = 0;
   const symbolDateStop = 16;
@@ -13,8 +23,10 @@ export const createRoutePointTemplate = (routePoint) => {
   const duration = getDuration(getDifferenseInDates(startTime, finishTime));
   let offersTemplate = ``;
   offers.forEach((offer) => {
-    const offerElement = createOfferTemplate(offer);
-    offersTemplate += offerElement;
+    if (offer.isChecked) {
+      const offerElement = createOfferTemplate(offer);
+      offersTemplate += offerElement;
+    }
   });
   return (
     `<li class="trip-events__item">
@@ -49,24 +61,23 @@ export const createRoutePointTemplate = (routePoint) => {
   );
 };
 
-export default class RoutePointView {
+export default class RoutePointView extends AbstractView {
   constructor(routePoint) {
-    this._element = null;
+    super();
     this._routePoint = routePoint;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createRoutePointTemplate(this._routePoint);
   }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
+  _clickHandler(evt) {
+    evt.preventDefault();
+    this._callback.click();
   }
+  setClickHandler(callBack) {
+    this._callback.click = callBack;
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, this._clickHandler);
 
-  removeElement() {
-    this._element = null;
   }
 }

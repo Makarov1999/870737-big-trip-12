@@ -1,32 +1,3 @@
-export const createElement = (template) => {
-  const element = document.createElement(`div`);
-  element.innerHTML = template;
-  return element.firstChild;
-};
-
-export const render = (container, element, position) => {
-  switch (position) {
-    case `afterbegin`:
-      container.prepend(element);
-      break;
-    case `beforeend`:
-      container.append(element);
-      break;
-  }
-};
-
-export const getRandomIntNumber = (a = 0, b = 1) => {
-  const lower = Math.ceil(Math.min(a, b));
-  const upper = Math.floor(Math.max(a, b));
-
-  return Math.floor(lower + Math.random() * (upper - lower + 1));
-};
-
-export const getRandomElementFromArr = (arr) => {
-  const randIndex = getRandomIntNumber(0, arr.length - 1);
-  return arr[randIndex];
-};
-
 export const getDifferenseInDates = (firstDate, secondDate) => {
   const TO_MINITES = 60000;
   const TO_DAYS = 1440;
@@ -90,62 +61,18 @@ export const getDuration = (duration) => {
 };
 
 export const prepareDateToDay = (date) => {
-  const month = date.getMonth();
-  let dateExpression = ``;
-  switch (month) {
-    case 0:
-      dateExpression += `JAN `;
-      break;
-    case 1:
-      dateExpression += `FEB `;
-      break;
-    case 2:
-      dateExpression += `MAR `;
-      break;
-    case 3:
-      dateExpression += `APR `;
-      break;
-    case 4:
-      dateExpression += `MAY `;
-      break;
-    case 5:
-      dateExpression += `JUN `;
-      break;
-    case 6:
-      dateExpression += `JUL`;
-      break;
-    case 7:
-      dateExpression += `AUG`;
-      break;
-    case 8:
-      dateExpression += `SEP`;
-      break;
-    case 9:
-      dateExpression += `OCT`;
-      break;
-    case 10:
-      dateExpression += `NOV`;
-      break;
-    case 11:
-      dateExpression += `DEC`;
-      break;
+  const MONTHS = [`JAN`, `FEB`, `MAR`, `APR`, `MAY`, `JUN`, `JUL`, `AUG`, `SEP`, `OCT`, `NOV`, `DEC`];
+  if (!(date instanceof Date)) {
+    return ``;
+  } else {
+    const month = date.getMonth();
+    const dateExpression = MONTHS[month] + ` ` + date.getDate();
+    return dateExpression;
   }
-  return (dateExpression += date.getDate());
 };
 
 export const setDateToForm = (date) => {
   const options = {year: `2-digit`, month: `2-digit`, day: `numeric`, hour: `2-digit`, minute: `2-digit`, hour12: false};
   const resultDate = date.toLocaleString(`en-GB`, options).replace(`,`, ``);
   return resultDate;
-};
-
-export const countTripCost = (routePoints) => {
-  const cost = routePoints.reduce((accumulator, routePoint) => {
-    return accumulator + routePoint.cost;
-  }, 0);
-  return cost;
-};
-
-export const renderElement = (parent, template, position) => {
-  parent.insertAdjacentHTML(position, template);
 };

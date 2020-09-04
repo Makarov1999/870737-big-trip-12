@@ -1,4 +1,5 @@
-import {prepareDateToDay, createElement} from "../util.js";
+import {prepareDateToDay} from "../utils/date.js";
+import AbstractView from "./abstract.js";
 const createDayTemplate = (date, dayCounter) => {
   return (
     `<li class="trip-days__item  day">
@@ -10,25 +11,14 @@ const createDayTemplate = (date, dayCounter) => {
   );
 };
 
-export default class DayView {
+export default class DayView extends AbstractView {
   constructor(date, dayCounter) {
-    this._element = null;
+    super();
     this._date = date;
     this._dayCounter = dayCounter;
   }
 
   getTemplate() {
     return createDayTemplate(this._date, this._dayCounter);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
