@@ -8,6 +8,12 @@ export const CAPTIONS_TEXT = {
   EVENT: `Trip events`
 };
 
+export const SortType = {
+  DEFAULT: `default`,
+  TIME: `time`,
+  PRICE: `price`
+};
+
 export const ROUTE_POINT_TYPES = [
   `Taxi`,
   `Bus`,
