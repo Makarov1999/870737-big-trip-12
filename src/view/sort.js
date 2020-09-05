@@ -44,9 +44,6 @@ export default class SortView extends AbstractView {
     return createSortTemplate();
   }
   _sortTypeChangeHandler(evt) {
-    if (evt.target.tagname !== `INPUT`) {
-      return;
-    }
     evt.preventDefault();
     this._callback.sortTypeChange(evt.target.dataset.sortType);
   }

@@ -62,6 +62,7 @@ export default class {
 
   }
   _renderRoutePointsByDays() {
+    this._dayList.getElement().innerHTML = ``;
     if (this._routePoints.length > 0) {
       let currentDay = this._routePoints[0].startTime;
       let daysIterator = 1;
@@ -86,18 +87,21 @@ export default class {
     render(this._eventsTripContainer, this._noRoutePointComponent, ELEMENTS_POSITIONS.BEFOREEND);
   }
   _renderRoutePoints() {
+    this._dayList.getElement().innerHTML = ``;
+    const emptyDay = new DayView();
     const eventList = new RoutePointListView();
     this._routePoints.forEach((routePoint) => {
       this._renderRoutePoint(eventList, routePoint);
     });
-    render(this._dayList, eventList, ELEMENTS_POSITIONS.BEFOREEND);
+    render(emptyDay, eventList, ELEMENTS_POSITIONS.BEFOREEND);
+    render(this._dayList, emptyDay, ELEMENTS_POSITIONS.BEFOREEND);
     render(this._eventsTripContainer, this._dayList, ELEMENTS_POSITIONS.BEFOREEND);
   }
   _renderFilter() {
     render(this._tripControlContainer, this._filterComponent, ELEMENTS_POSITIONS.BEFOREEND);
   }
   _clearRoutePoints() {
-    this._eventsTripContainer.getElement().innerHTML = `<h2 class="visually-hidden">Trip events</h2`;
+    this._eventsTripContainer.innerHTML = `<h2 class="visually-hidden">Trip events</h2`;
   }
   _sortRoutePoints(sortType) {
     switch (sortType) {
@@ -113,12 +117,12 @@ export default class {
     this._currentSortType = sortType;
   }
   _handleSortTypeChange(sortType) {
-    console.log(`Sort`);
     if (this._currentSortType === sortType) {
       return;
     }
     this._sortRoutePoints(sortType);
     this._clearRoutePoints();
+    render(this._eventsTripContainer, this._sortComponent, ELEMENTS_POSITIONS.BEFOREEND);
     if (this._currentSortType === SortType.DEFAULT) {
       this._renderRoutePointsByDays();
     } else {
