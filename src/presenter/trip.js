@@ -2,17 +2,16 @@ import TripInfoView from "../view/trip-info.js";
 import MainMenuView from "../view/main-menu.js";
 import FilterView from "../view/filter.js";
 import SortView from "../view/sort.js";
-import FormView from "../view/form.js";
-import RoutePointView from "../view/route-point.js";
 import DayListView from "../view/day-list.js";
 import DayView from "../view/day.js";
 import CaptionView from "../view/caption.js";
 import RoutePointListView from "../view/route-point-list.js";
 import NoRoutePointView from "../view/no-route-points.js";
-import {CITIES, ELEMENTS_POSITIONS, CAPTIONS_TEXT, SortType} from "../const.js";
-import {countTripCost, countRoute} from "../utils/common.js";
+import {ELEMENTS_POSITIONS, CAPTIONS_TEXT, SortType} from "../const.js";
+import {countTripCost, countRoute, updateItem} from "../utils/common.js";
 import {sortRoutePointsByPrice, sortRoutePointsByTime} from "../utils/sort.js";
-import {render, replace} from "../utils/render.js";
+import {render} from "../utils/render.js";
+import RoutePoint from "./route-point.js";
 
 export default class {
   constructor(tripMainContainer, tripControlContainer, eventsTripContainer) {
@@ -26,6 +25,8 @@ export default class {
     this._dayList = new DayListView();
     this._currentSortType = SortType.DEFAULT;
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
+    this._routePointPresenter = {};
+    this._handleRoutePointChange = this._handleRoutePointChange.bind(this);
   }
 
   init(routePoints) {
@@ -39,41 +40,23 @@ export default class {
     render(this._eventsTripContainer, new CaptionView(CAPTIONS_TEXT.EVENT), ELEMENTS_POSITIONS.AFTERBEGIN);
     this._renderTrip();
   }
-  _renderRoutePoint(container, routePoint) {
-    const routePointComponent = new RoutePointView(routePoint);
-    const routePointFormComponent = new FormView(CITIES, routePoint);
-    const onFormEscPress = (evt) => {
-      if (evt.key === `Escape` || evt.key === `Esc`) {
-        evt.preventDefault();
-        replaceFormToRoutePoint();
-      }
-    };
-    const replaceRoutePointToForm = () => {
-      replace(routePointFormComponent, routePointComponent);
-      document.addEventListener(`keydown`, onFormEscPress);
-    };
-    const replaceFormToRoutePoint = () => {
-      replace(routePointComponent, routePointFormComponent);
-      document.removeEventListener(`keydown`, onFormEscPress);
-    };
-    render(container, routePointComponent.getElement(), ELEMENTS_POSITIONS.BEFOREEND);
-    routePointComponent.setClickHandler(replaceRoutePointToForm);
-    routePointFormComponent.setSubmitHandler(replaceFormToRoutePoint);
-
+  _handleRoutePointChange(updatedRoutePoint) {
+    this._routePoints = updateItem(this._routePoints, updatedRoutePoint);
+    this._sourceRoutePoints = updateItem(this._sourceRoutePoints, updatedRoutePoint);
+    this._routePointPresenter[updatedRoutePoint.id].init(updatedRoutePoint);
   }
   _renderRoutePointsByDays() {
-    this._dayList.getElement().innerHTML = ``;
     if (this._routePoints.length > 0) {
       let currentDay = this._routePoints[0].startTime;
       let daysIterator = 1;
       let dayElement = new DayView(currentDay, daysIterator).getElement();
-      let eventList = new RoutePointListView().getElement();
+      let eventList = new RoutePointListView();
       for (let i = 0; i < this._routePoints.length; i++) {
         if (this._routePoints[i].startTime.getDate() !== currentDay.getDate()) {
           daysIterator++;
           currentDay = this._routePoints[i].startTime;
           dayElement = new DayView(currentDay, daysIterator).getElement();
-          eventList = new RoutePointListView().getElement();
+          eventList = new RoutePointListView();
         }
         render(dayElement, eventList, ELEMENTS_POSITIONS.BEFOREEND);
         render(this._dayList, dayElement, ELEMENTS_POSITIONS.BEFOREEND);
@@ -81,13 +64,11 @@ export default class {
       }
       render(this._eventsTripContainer, this._dayList, ELEMENTS_POSITIONS.BEFOREEND);
     }
-
   }
   _renderNoRoutePoints() {
     render(this._eventsTripContainer, this._noRoutePointComponent, ELEMENTS_POSITIONS.BEFOREEND);
   }
   _renderRoutePoints() {
-    this._dayList.getElement().innerHTML = ``;
     const emptyDay = new DayView();
     const eventList = new RoutePointListView();
     this._routePoints.forEach((routePoint) => {
@@ -100,8 +81,14 @@ export default class {
   _renderFilter() {
     render(this._tripControlContainer, this._filterComponent, ELEMENTS_POSITIONS.BEFOREEND);
   }
+  _renderRoutePoint(routePointList, routePoint) {
+    const routePointPresenter = new RoutePoint(routePointList, this._handleRoutePointChange);
+    routePointPresenter.init(routePoint);
+    this._routePointPresenter[routePoint.id] = routePointPresenter;
+
+  }
   _clearRoutePoints() {
-    this._eventsTripContainer.innerHTML = `<h2 class="visually-hidden">Trip events</h2`;
+    this._dayList.getElement().innerHTML = ``;
   }
   _sortRoutePoints(sortType) {
     switch (sortType) {

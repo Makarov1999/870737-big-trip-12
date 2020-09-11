@@ -1,4 +1,4 @@
-import {getRandomIntNumber, getRandomElementFromArr} from "../utils/rand.js";
+import {getRandomIntNumber, getRandomElementFromArr, getRandomBoolean} from "../utils/rand.js";
 import {ROUTE_POINT_TYPES, DESCRIPTIONS_TO_ROUTE_POINT, CITIES} from "../const.js";
 import {setOffers} from "./offer.js";
 
@@ -28,7 +28,11 @@ const getFinishDate = (startDate) => {
   return new Date(finishDate);
 };
 
+const generateId = () => {
+  return Date.now() + parseInt(Math.random() * 10000, 10);
+};
 export const generateRoutePoint = (previousTimeFinish) => {
+  const id = generateId();
   const type = getRandomElementFromArr(ROUTE_POINT_TYPES);
   const city = getRandomElementFromArr(CITIES);
   const description = getDescription(1, 5, DESCRIPTIONS_TO_ROUTE_POINT);
@@ -37,14 +41,17 @@ export const generateRoutePoint = (previousTimeFinish) => {
   const finishTime = getFinishDate(startTime);
   const photos = generatePhotosPlug();
   const cost = getRandomIntNumber(50, 400);
+  const isFavorite = getRandomBoolean();
   return {
+    id,
     type,
     city,
     info: {description, photos},
     offers,
     startTime,
     finishTime,
-    cost
+    cost,
+    isFavorite
   };
 };
 
