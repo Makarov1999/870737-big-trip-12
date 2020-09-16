@@ -27,6 +27,7 @@ export default class {
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
     this._routePointPresenter = {};
     this._handleRoutePointChange = this._handleRoutePointChange.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
   }
 
   init(routePoints) {
@@ -44,6 +45,10 @@ export default class {
     this._routePoints = updateItem(this._routePoints, updatedRoutePoint);
     this._sourceRoutePoints = updateItem(this._sourceRoutePoints, updatedRoutePoint);
     this._routePointPresenter[updatedRoutePoint.id].init(updatedRoutePoint);
+  }
+  _handleModeChange() {
+    Object.values(this._routePointPresenter)
+    .forEach((presenter) => presenter.resetView());
   }
   _renderRoutePointsByDays() {
     if (this._routePoints.length > 0) {
@@ -82,7 +87,7 @@ export default class {
     render(this._tripControlContainer, this._filterComponent, ELEMENTS_POSITIONS.BEFOREEND);
   }
   _renderRoutePoint(routePointList, routePoint) {
-    const routePointPresenter = new RoutePoint(routePointList, this._handleRoutePointChange);
+    const routePointPresenter = new RoutePoint(routePointList, this._handleRoutePointChange, this._handleModeChange);
     routePointPresenter.init(routePoint);
     this._routePointPresenter[routePoint.id] = routePointPresenter;
 

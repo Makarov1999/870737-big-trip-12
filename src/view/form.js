@@ -25,7 +25,7 @@ const createEventFormTypeTemplate = (eventName, isChecked) => {
   const valueEvent = eventName.toLowerCase();
   return (
     `<div class="event__type-item">
-      <input id="event-type-${valueEvent}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${valueEvent}" ${isChecked ? `checked` : ``}>
+      <input id="event-type-${valueEvent}-1" class="event__type-input  visually-hidden" data-type="type" type="radio" name="event-type" value="${valueEvent}" ${isChecked ? `checked` : ``}>
       <label class="event__type-label  event__type-label--${valueEvent}" for="event-type-${valueEvent}-1">${eventName}</label>
     </div>`
   );
@@ -71,7 +71,7 @@ export const createFormMarksRouteTemplate = (cities, routePoint) => {
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type} ${prepos}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${city}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" data-type="city" type="text" name="event-destination" value="${city}" list="destination-list-1">
             <datalist id="destination-list-1">
               ${createCitiesFormItems(cities)}
             </datalist>
@@ -94,7 +94,7 @@ export const createFormMarksRouteTemplate = (cities, routePoint) => {
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${cost}">
+            <input class="event__input  event__input--price" id="event-price-1" data-type="cost" type="text" name="event-price" value="${cost}">
           </div>
 
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -186,7 +186,13 @@ export default class FormView extends AbstractView {
     super();
     this._cities = cities;
     this._submitHandler = this._submitHandler.bind(this);
+    this._resetHandler = this._resetHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
+    this._costChangeHandler = this._costChangeHandler.bind(this);
+    this._cityChangeHandler = this._cityChangeHandler.bind(this);
+    this._typeChangeHandler = this._typeChangeHandler.bind(this);
+    this._offerChangeHandler = this._offerChangeHandler.bind(this);
+
     if (routePoint) {
       this._routePoint = routePoint;
       this._offers = routePoint.offers;
@@ -216,16 +222,56 @@ export default class FormView extends AbstractView {
     evt.preventDefault();
     this._callback.submit(this._routePoint);
   }
+  _resetHandler(evt) {
+    evt.preventDefault();
+    this._callback.resetClick();
+  }
   _favoriteClickHandler(evt) {
     evt.preventDefault();
     this._callback.favoriteClick();
+  }
+  _costChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.costChange(evt.target.dataset.type, evt.target.value);
+  }
+  _cityChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.cityChange(evt.target.dataset.type, evt.target.value);
+  }
+  _typeChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.typeChange(evt.target.dataset.type, evt.target.value);
+  }
+  _offerChangeHandler(evt) {
+    evt.preventDefault();
+    this._callback.offerChange(evt.target, this._offers);
   }
   setSubmitHandler(callBack) {
     this._callback.submit = callBack;
     this.getElement().addEventListener(`submit`, this._submitHandler);
   }
+  setResetHandler(callBack) {
+    this._callback.resetClick = callBack;
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, this._resetHandler);
+  }
   setFavoriteClickHandler(callBack) {
     this._callback.favoriteClick = callBack;
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
+  }
+  setCostChangeHandler(callBack) {
+    this._callback.costChange = callBack;
+    this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._costChangeHandler);
+  }
+  setCityChangeHandler(callBack) {
+    this._callback.cityChange = callBack;
+    this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._cityChangeHandler);
+  }
+  setTypeChangeHandler(callBack) {
+    this._callback.typeChange = callBack;
+    this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._typeChangeHandler);
+  }
+  setOfferChangeHanler(callBack) {
+    this._callback.offerChange = callBack;
+    this.getElement().querySelector(`.event__available-offers`).addEventListener(`change`, this._offerChangeHandler);
   }
 }
