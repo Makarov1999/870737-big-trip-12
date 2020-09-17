@@ -1,6 +1,6 @@
 export const sortRoutePointsByTime = (routePointA, routePointB) => {
-  return ((routePointA.finishTime - routePointA.startTime) - (routePointB.finishTime - routePointB.startTime));
+  return ((routePointB.finishTime - routePointB.startTime) - (routePointA.finishTime - routePointA.startTime));
 };
 export const sortRoutePointsByPrice = (routePointA, routePointB) => {
-  return routePointA.cost - routePointB.cost;
+  return routePointB.cost - routePointA.cost;
 };
