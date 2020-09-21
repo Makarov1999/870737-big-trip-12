@@ -237,7 +237,6 @@ export default class FormView extends AbstractView {
           defaultDate: this._routePoint.startTime,
           onChange: this._startDateChangeHandler,
           enableTime: true,
-          // maxDate: this.getElement().querySelector(`#event-end-time-1`).value
         }
     );
   }
@@ -253,7 +252,6 @@ export default class FormView extends AbstractView {
           defaultDate: this._routePoint.finishTime,
           onChange: this._finishDateChangeHandler,
           enableTime: true,
-          // minDate: this.getElement().querySelector(`#event-start-time-1`).value
         }
     );
     this._callback.changeFinishDate = callBack;
