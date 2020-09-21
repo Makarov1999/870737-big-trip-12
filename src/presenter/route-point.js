@@ -24,7 +24,9 @@ export default class RoutePoint {
     this._handleFormEdit = this._handleFormEdit.bind(this);
     this._handleFormOffers = this._handleFormOffers.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
-    // this.resetView = this.resetView.bind(this);
+    this.resetView = this.resetView.bind(this);
+    this._handleFormDateStart = this._handleFormDateStart.bind(this);
+    this._handleFormDateFinish = this._handleFormDateFinish.bind(this);
   }
   init(routePoint) {
     this._routePoint = routePoint;
@@ -40,6 +42,8 @@ export default class RoutePoint {
     this._routePointFormComponent.setCityChangeHandler(this._handleFormEdit);
     this._routePointFormComponent.setTypeChangeHandler(this._handleFormEdit);
     this._routePointFormComponent.setOfferChangeHanler(this._handleFormOffers);
+    this._routePointFormComponent._setDatePickerStart(this._handleFormDateStart);
+    this._routePointFormComponent._setDatePickerFinish(this._handleFormDateFinish);
     if (this._prevRoutePointComponent === null || this._prevRoutePointFormComponent === null) {
       render(this._routePointContainer, this._routePointComponent, ELEMENTS_POSITIONS.BEFOREEND);
       return;
@@ -118,5 +122,22 @@ export default class RoutePoint {
           offers: updateOffers(changedOffer, offers)
         }
     );
+  }
+  _handleFormDateStart(value) {
+    const date = value;
+    this._routePoint = Object.assign(
+        {},
+        this._routePoint,
+        {startTime: date}
+    );
+  }
+  _handleFormDateFinish(value) {
+    const date = value;
+    this._routePoint = Object.assign(
+        {},
+        this._routePoint,
+        {finishTime: date}
+    );
+
   }
 }

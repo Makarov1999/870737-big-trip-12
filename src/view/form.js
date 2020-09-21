@@ -5,6 +5,8 @@ import {setDateToForm} from "../utils/date.js";
 import {render} from "../utils/render.js";
 import AbstractView from "./abstract.js";
 import OfferView from "../view/offer.js";
+import flatpickr from "flatpickr";
+import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 const createCitiesFormItems = (cities) => {
   let citiesFormTemlate = ``;
   cities.forEach((city) => {
@@ -81,12 +83,12 @@ export const createFormMarksRouteTemplate = (cities, routePoint) => {
             <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${setDateToForm(startTime)}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${setDateToForm(startTime)}" data-date="${startTime}">
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${setDateToForm(finishTime)}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${setDateToForm(finishTime)}" data-date="${finishTime}">
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -185,8 +187,12 @@ export default class FormView extends AbstractView {
   constructor(cities, routePoint) {
     super();
     this._cities = cities;
+    this._datepickerStart = null;
+    this._datepickerFinish = null;
     this._submitHandler = this._submitHandler.bind(this);
     this._resetHandler = this._resetHandler.bind(this);
+    this._startDateChangeHandler = this._startDateChangeHandler.bind(this);
+    this._finishDateChangeHandler = this._finishDateChangeHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._costChangeHandler = this._costChangeHandler.bind(this);
     this._cityChangeHandler = this._cityChangeHandler.bind(this);
@@ -218,6 +224,60 @@ export default class FormView extends AbstractView {
     }
     return this._element;
   }
+  _setDatePickerStart(callBack) {
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+    }
+    this._callback.changeStartDate = callBack;
+    this._datepickerStart = flatpickr(
+        this.getElement().querySelector(`#event-start-time-1`),
+        {
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._routePoint.startTime,
+          onChange: this._startDateChangeHandler,
+          enableTime: true,
+        }
+    );
+  }
+  _setDatePickerFinish(callBack) {
+    if (this._datepickerFinish) {
+      this._datepickerFinish.destroy();
+      this._datepickerFinish = null;
+    }
+    this._datepickerFinish = flatpickr(
+        this.getElement().querySelector(`#event-end-time-1`),
+        {
+          dateFormat: `d/m/y H:i`,
+          defaultDate: this._routePoint.finishTime,
+          onChange: this._finishDateChangeHandler,
+          enableTime: true,
+        }
+    );
+    this._callback.changeFinishDate = callBack;
+  }
+  _startDateChangeHandler(selectedDates) {
+    const startDate = selectedDates[0];
+    const previousDate = new Date(this.getElement().querySelector(`#event-start-time-1`).dataset.date);
+    const startDateMax = new Date(this.getElement().querySelector(`#event-end-time-1`).dataset.date);
+    if (startDate > startDateMax) {
+      this.getElement().querySelector(`#event-start-time-1`).value = setDateToForm(previousDate);
+    } else {
+      this.getElement().querySelector(`#event-start-time-1`).dataset.date = startDate;
+      this._callback.changeStartDate(startDate);
+    }
+  }
+  _finishDateChangeHandler(selectedDates) {
+    const finishDate = selectedDates[0];
+    const previousDate = new Date(this.getElement().querySelector(`#event-end-time-1`).dataset.date);
+    const finishtDateMin = new Date(this.getElement().querySelector(`#event-start-time-1`).dataset.date);
+    if (finishDate < finishtDateMin) {
+      this.getElement().querySelector(`#event-end-time-1`).value = setDateToForm(previousDate);
+    } else {
+      this.getElement().querySelector(`#event-start-time-1`).dataset.date = finishDate;
+      this._callback.changeFinishDate(finishDate);
+    }
+  }
   _submitHandler(evt) {
     evt.preventDefault();
     this._callback.submit(this._routePoint);
@@ -226,8 +286,7 @@ export default class FormView extends AbstractView {
     evt.preventDefault();
     this._callback.resetClick();
   }
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
+  _favoriteClickHandler() {
     this._callback.favoriteClick();
   }
   _costChangeHandler(evt) {
