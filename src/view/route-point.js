@@ -1,4 +1,4 @@
-import {getDifferenseInDates, getDuration} from "../utils/date.js";
+import {getDurationInDates} from "../utils/date.js";
 import AbstractView from "./abstract.js";
 
 const createOfferTemplate = (offer) => {
@@ -20,7 +20,7 @@ export const createRoutePointTemplate = (routePoint) => {
   const finishDate = finishTime.toISOString().slice(symbolDateStart, symbolDateStop);
   const routePointTimeStart = startTime.toLocaleString(`ru-RU`, {hour: `numeric`, minute: `numeric`});
   const routePointTimeStop = finishTime.toLocaleString(`ru-RU`, {hour: `numeric`, minute: `numeric`});
-  const duration = getDuration(getDifferenseInDates(startTime, finishTime));
+  const duration = getDurationInDates(startTime, finishTime);
   let offersTemplate = ``;
   offers.forEach((offer) => {
     if (offer.isChecked) {
