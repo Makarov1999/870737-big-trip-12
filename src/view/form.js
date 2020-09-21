@@ -286,8 +286,7 @@ export default class FormView extends AbstractView {
     evt.preventDefault();
     this._callback.resetClick();
   }
-  _favoriteClickHandler(evt) {
-    evt.preventDefault();
+  _favoriteClickHandler() {
     this._callback.favoriteClick();
   }
   _costChangeHandler(evt) {
