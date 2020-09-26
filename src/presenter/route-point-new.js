@@ -6,7 +6,6 @@ import {DEFAULT_POINT} from "../view/form.js";
 
 export default class RoutePointNew {
   constructor(routePointContainer, changeData) {
-    // this._routePoint = Object.assign({}, DEFAULT_POINT);
     this._routePointContainer = routePointContainer;
     this._changeData = changeData;
     this._routePointFormComponent = null;
@@ -20,7 +19,6 @@ export default class RoutePointNew {
       return;
     }
     this._routePointFormComponent = new FormView();
-    console.log(this._routePoint);
     this._routePointFormComponent.setSubmitHandler(this._handleSubmitHandler);
     this._routePointFormComponent.setDeleteHandler(this._handleDeleteClick);
     this._routePointFormComponent.setOfferChangeHanler(this._handleFormOffers);
