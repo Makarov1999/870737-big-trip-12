@@ -1,10 +1,20 @@
 import {generateRoutePoints} from "./mock/route-point.js";
 import Trip from "./presenter/trip.js";
-
+import Points from "./model/points.js";
+import Filter from "./model/filter.js";
+import FilterPresenter from "./presenter/filter.js";
 const routePoints = generateRoutePoints(15);
+const points = new Points();
+points.setPoints(routePoints);
+const filter = new Filter();
 const mainTripBlock = document.querySelector(`.trip-main`);
 const mainTripFilterContainer = mainTripBlock.querySelector(`.trip-controls`);
 const eventsTripContainer = document.querySelector(`.trip-events`);
-
-const trip = new Trip(mainTripBlock, mainTripFilterContainer, eventsTripContainer);
+const filterPresenter = new FilterPresenter(mainTripFilterContainer, filter, points);
+const trip = new Trip(mainTripBlock, mainTripFilterContainer, eventsTripContainer, points, filter);
+filterPresenter.init();
 trip.init(routePoints);
+document.querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, (evt) => {
+  evt.preventDefault();
+  trip.createRoutePoint();
+});
