@@ -7,7 +7,7 @@ import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
 import {OFFERS, isOfferChecked, getOffersByType} from "../mock/offer.js";
 import {DESTINATIONS, getCities, getDestination} from "../mock/destination.js";
-const DEFAULT_POINT = {
+export const DEFAULT_POINT = {
   type: ROUTE_POINT_TYPES[0],
   destination: DESTINATIONS[0],
   offers: [],
