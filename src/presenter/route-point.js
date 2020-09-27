@@ -23,7 +23,6 @@ export default class RoutePoint {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._handleResetHandler = this._handleResetHandler.bind(this);
     this._handleFavoriteHandler = this._handleFavoriteHandler.bind(this);
-    this._handleFormOffers = this._handleFormOffers.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
   init(routePoint) {
@@ -37,7 +36,6 @@ export default class RoutePoint {
     this._routePointFormComponent.setResetHandler(this._handleResetHandler);
     this._routePointFormComponent.setDeleteHandler(this._handleDeleteClick);
     this._routePointFormComponent.setFavoriteClickHandler(this._handleFavoriteHandler);
-    this._routePointFormComponent.setOfferChangeHanler(this._handleFormOffers);
     if (this._prevRoutePointComponent === null || this._prevRoutePointFormComponent === null) {
       render(this._routePointContainer, this._routePointComponent, ELEMENTS_POSITIONS.BEFOREEND);
       return;
@@ -117,35 +115,5 @@ export default class RoutePoint {
             }
         )
     );
-  }
-  _handleFormOffers(title, price) {
-    const offers = this._routePoint.offers.slice();
-    const isOfferInclude = offers.some((offer) => offer.title === title);
-    if (isOfferInclude) {
-      this._changeData(
-          UserAction.UPDATE_POINT,
-          UpdateType.PATCH,
-          this._routePoint = Object.assign(
-              {},
-              this._routePoint,
-              {
-                offers: offers.filter((offer) => offer.title !== title)
-              }
-          )
-      );
-    } else {
-      offers.push({title, price});
-      this._changeData(
-          UserAction.UPDATE_POINT,
-          UpdateType.PATCH,
-          this._routePoint = Object.assign(
-              {},
-              this._routePoint,
-              {
-                offers
-              }
-          )
-      );
-    }
   }
 }

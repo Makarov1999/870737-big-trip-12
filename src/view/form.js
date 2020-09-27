@@ -263,10 +263,14 @@ export default class FormView extends Smart {
     this.getElement().querySelector(`.event__input--destination`).addEventListener(`change`, this._destinationChangeHandler);
     this.getElement().querySelector(`.event__type-list`).addEventListener(`change`, this._typeChangeHandler);
     this.getElement().querySelector(`.event__input--price`).addEventListener(`change`, this._costChangeHandler);
+    if (this.getElement().querySelector(`.event__available-offers`)) {
+      this.getElement().querySelector(`.event__available-offers`).addEventListener(`change`, this._offerChangeHandler);
+    }
   }
   restoreHandlers() {
     this.setSubmitHandler(this._callback.submit);
     this.setDeleteHandler(this._callback.deleteClick);
+    // this.setOfferChangeHanler(this._callback.offerChange);
     if (this._routePoint.id) {
       this.setResetHandler(this._callback.resetClick);
     }
@@ -379,7 +383,14 @@ export default class FormView extends Smart {
     });
   }
   _offerChangeHandler(evt) {
-    this._callback.offerChange(evt.target.value, evt.target.dataset.price);
+    if (evt.target.checked) {
+      const offers = this._routePoint.offers.slice();
+      offers.push({title: evt.target.value, price: evt.target.dataset.price});
+      this.updateData({offers});
+    } else {
+      const offers = this._routePoint.offers.filter((offer) => offer.title !== evt.target.value);
+      this.updateData({offers});
+    }
   }
   setSubmitHandler(callBack) {
     this._callback.submit = callBack;
@@ -397,11 +408,5 @@ export default class FormView extends Smart {
   setFavoriteClickHandler(callBack) {
     this._callback.favoriteClick = callBack;
     this.getElement().querySelector(`.event__favorite-btn`).addEventListener(`click`, this._favoriteClickHandler);
-  }
-  setOfferChangeHanler(callBack) {
-    this._callback.offerChange = callBack;
-    if (this.getElement().querySelector(`.event__available-offers`)) {
-      this.getElement().querySelector(`.event__available-offers`).addEventListener(`change`, this._offerChangeHandler);
-    }
   }
 }
