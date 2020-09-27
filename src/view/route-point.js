@@ -4,18 +4,18 @@ import AbstractView from "./abstract.js";
 const createOfferTemplate = (offer) => {
   return (
     `<li class="event__offer">
-      <span class="event__offer-title">${offer.name}</span>
+      <span class="event__offer-title">${offer.title}</span>
       &plus;
-      &euro;&nbsp;<span class="event__offer-price">${offer.cost}</span>
+      &euro;&nbsp;<span class="event__offer-price">${offer.price}</span>
      </li>`
   );
 };
 export const createRoutePointTemplate = (routePoint) => {
   const symbolDateStart = 0;
   const symbolDateStop = 16;
-  const {type, city, offers, startTime, finishTime, cost} = routePoint;
+  const {type, destination, offers, startTime, finishTime, cost} = routePoint;
   const typeIcon = type.toLowerCase();
-  const prepos = (type === `Check` || type === `Restaurant` || type === `Sightseeing`) ? `in` : `to`;
+  const prepos = (type === `check-in` || type === `restaurant` || type === `sightseeing`) ? `in` : `to`;
   const startDate = startTime.toISOString().slice(symbolDateStart, symbolDateStop);
   const finishDate = finishTime.toISOString().slice(symbolDateStart, symbolDateStop);
   const routePointTimeStart = startTime.toLocaleString(`ru-RU`, {hour: `numeric`, minute: `numeric`});
@@ -34,7 +34,7 @@ export const createRoutePointTemplate = (routePoint) => {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${typeIcon}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${type} ${prepos} ${city}</h3>
+        <h3 class="event__title">${type.substring(0, 1).toUpperCase() + type.substring(1)} ${prepos} ${destination.name}</h3>
 
         <div class="event__schedule">
           <p class="event__time">

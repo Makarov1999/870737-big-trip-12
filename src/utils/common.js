@@ -1,3 +1,4 @@
+import {getRandomIntNumber, getRandomElementFromArr} from "./rand.js";
 export const createElement = (template) => {
   const element = document.createElement(`div`);
   element.innerHTML = template;
@@ -60,4 +61,13 @@ export const updateOffers = (update, offers) => {
     update,
     ...offers.slice(index + 1)
   ];
+};
+
+export const getDescription = (minSentencesCount = 1, maxSentencesCount = 5, sentences) => {
+  const sentencesCount = getRandomIntNumber(minSentencesCount, maxSentencesCount);
+  let resultSentence = ``;
+  for (let i = 0; i < sentencesCount; i++) {
+    resultSentence += getRandomElementFromArr(sentences) + ` `;
+  }
+  return resultSentence;
 };
