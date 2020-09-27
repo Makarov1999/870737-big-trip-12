@@ -57,9 +57,9 @@ export default class {
     const filteredPoints = filter[filterType](points);
     switch (this._currentSortType) {
       case SortType.PRICE:
-        return filteredPoints.sort(sortRoutePointsByPrice);
+        return filteredPoints.slice().sort(sortRoutePointsByPrice);
       case SortType.TIME:
-        return filteredPoints.sort(sortRoutePointsByTime);
+        return filteredPoints.slice().sort(sortRoutePointsByTime);
     }
     return filteredPoints;
   }

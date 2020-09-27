@@ -16,7 +16,7 @@ export default class RoutePoint {
     this._changeMode = changeMode;
     this._routePointComponent = null;
     this._routePointFormComponent = null;
-    this._currentUpdateType = UpdateType.PATCH;
+    this._currentUpdateType = UpdateType.MINOR;
     this._mode = Mode.DEFAULT;
     this._handleClickHandler = this._handleClickHandler.bind(this);
     this._handleSubmitHandler = this._handleSubmitHandler.bind(this);

@@ -232,7 +232,6 @@ export default class FormView extends Smart {
     this._routePoint = routePoint;
     this._datepickerStart = null;
     this._datepickerFinish = null;
-    this._currentUpdateType =
     this._submitHandler = this._submitHandler.bind(this);
     this._deleteHandler = this._deleteHandler.bind(this);
     this._resetHandler = this._resetHandler.bind(this);
@@ -270,7 +269,6 @@ export default class FormView extends Smart {
   restoreHandlers() {
     this.setSubmitHandler(this._callback.submit);
     this.setDeleteHandler(this._callback.deleteClick);
-    // this.setOfferChangeHanler(this._callback.offerChange);
     if (this._routePoint.id) {
       this.setResetHandler(this._callback.resetClick);
     }
