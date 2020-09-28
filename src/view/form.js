@@ -359,7 +359,7 @@ export default class FormView extends Smart {
       evt.target.setCustomValidity(`You should to input number`);
     } else {
       this.updateData({
-        cost: evt.target.value
+        cost: Number(evt.target.value)
       });
     }
   }

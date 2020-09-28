@@ -1,5 +1,3 @@
-import TripInfoView from "../view/trip-info.js";
-import MainMenuView from "../view/main-menu.js";
 import FilterView from "../view/filter.js";
 import SortView from "../view/sort.js";
 import DayListView from "../view/day-list.js";
@@ -9,9 +7,8 @@ import RoutePointListView from "../view/route-point-list.js";
 import NoRoutePointView from "../view/no-route-points.js";
 import {filter} from "../utils/filter.js";
 import {ELEMENTS_POSITIONS, CAPTIONS_TEXT, SortType, UserAction, UpdateType, FILTERS, FilterType} from "../const.js";
-import {countTripCost, countRoute} from "../utils/common.js";
 import {sortRoutePointsByPrice, sortRoutePointsByTime} from "../utils/sort.js";
-import {render} from "../utils/render.js";
+import {render, remove} from "../utils/render.js";
 import RoutePoint from "./route-point.js";
 import RoutePointNew from "./route-point-new.js";
 
@@ -22,7 +19,6 @@ export default class {
     this._filterModel = filterModel;
     this._tripControlContainer = tripControlContainer;
     this._eventsTripContainer = eventsTripContainer;
-    this._mainMenuComponent = new MainMenuView();
     this._filterComponent = new FilterView(FILTERS, FilterType.EVERYTHING);
     this._sortComponent = new SortView();
     this._noRoutePointComponent = new NoRoutePointView();
@@ -33,23 +29,26 @@ export default class {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
-    this._points.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
+
     this._routePointNewPresenter = new RoutePointNew(this._eventsTripContainer, this._handleViewAction);
   }
 
   init() {
-    this._renderTripInfo();
     render(this._tripControlContainer, new CaptionView(CAPTIONS_TEXT.TRIP_VIEW), ELEMENTS_POSITIONS.AFTERBEGIN);
-    this._renderMainMenu();
     render(this._tripControlContainer, new CaptionView(CAPTIONS_TEXT.FILTER), ELEMENTS_POSITIONS.BEFOREEND);
     render(this._eventsTripContainer, new CaptionView(CAPTIONS_TEXT.EVENT), ELEMENTS_POSITIONS.AFTERBEGIN);
     this._renderTrip();
+    this._points.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
   }
-  createRoutePoint() {
+  destroy() {
+    this._clearTrip();
+    this._points.removeObserver(this._handleModelEvent);
+    this._filterModel.removeObserver(this._handleModelEvent);
+  }
+  createRoutePoint(callBack) {
     this._currentSortType = SortType.DEFAULT;
-    this._filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
-    this._routePointNewPresenter.init();
+    this._routePointNewPresenter.init(callBack);
   }
   _getPoints() {
     const filterType = this._filterModel.getFilter();
@@ -91,6 +90,7 @@ export default class {
         break;
       case UpdateType.MAJOR:
         this._currentSortType = SortType.DEFAULT;
+        this._sortComponent.getElement().querySelector(`.trip-sort__item--event .trip-sort__input`).checked = true;
         this._clearRoutePoints();
         this._renderRoutePointsByDays(this._getPoints());
         break;
@@ -143,6 +143,10 @@ export default class {
     this._routePointNewPresenter.destroy();
     this._dayList.getElement().innerHTML = ``;
   }
+  _clearTrip() {
+    remove(this._sortComponent);
+    this._clearRoutePoints();
+  }
   _handleSortTypeChange(sortType) {
     if (this._currentSortType === sortType) {
       return;
@@ -162,18 +166,6 @@ export default class {
   _renderSort() {
     render(this._eventsTripContainer, this._sortComponent, ELEMENTS_POSITIONS.BEFOREEND);
     this._sortComponent.setSortTypeChangeHandler(this._handleSortTypeChange);
-  }
-  _renderMainMenu() {
-    render(this._tripControlContainer, this._mainMenuComponent, ELEMENTS_POSITIONS.AFTERBEGIN);
-  }
-  _renderTripInfo() {
-    const routePoints = this._getPoints();
-    const route = routePoints.length > 0 ? countRoute(routePoints) : ``;
-    const tripCost = countTripCost(routePoints) ? countTripCost(routePoints) : 0;
-    const tripStart = routePoints[0] ? routePoints[0].startTime : ``;
-    const tripFinish = routePoints[routePoints.length - 1] ? routePoints[routePoints.length - 1].finishTime : ``;
-    this._tripInfoComponent = new TripInfoView(route, tripCost, tripStart, tripFinish);
-    render(this._tripMainContainer, this._tripInfoComponent, ELEMENTS_POSITIONS.AFTERBEGIN);
   }
   _renderTrip() {
     const routePoints = this._getPoints();

@@ -23,10 +23,8 @@ export const createRoutePointTemplate = (routePoint) => {
   const duration = getDurationInDates(startTime, finishTime);
   let offersTemplate = ``;
   offers.forEach((offer) => {
-    if (offer.isChecked) {
-      const offerElement = createOfferTemplate(offer);
-      offersTemplate += offerElement;
-    }
+    const offerElement = createOfferTemplate(offer);
+    offersTemplate += offerElement;
   });
   return (
     `<li class="trip-events__item">
