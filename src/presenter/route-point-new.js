@@ -12,7 +12,8 @@ export default class RoutePointNew {
     this._handleDeleteClick = this._handleDeleteClick.bind(this);
     this._escKeyDownHandler = this._escKeyDownHandler.bind(this);
   }
-  init() {
+  init(callBack) {
+    this._destroyCallback = callBack;
     if (this._routePointFormComponent !== null) {
       return;
     }
@@ -25,6 +26,9 @@ export default class RoutePointNew {
   destroy() {
     if (this._routePointFormComponent === null) {
       return;
+    }
+    if (this._destroyCallback !== null) {
+      this._destroyCallback();
     }
     remove(this._routePointFormComponent);
     this._routePointFormComponent = null;

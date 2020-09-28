@@ -27,6 +27,41 @@ export const ROUTE_POINT_TYPES = [
   `restaurant`
 ];
 
+export const ROUTE_POINT_TYPES_MONEY_CHART = [
+  `🚕 TAXI`,
+  `🚌 BUS`,
+  `🚂 TRAIN`,
+  `🛳 SHIP`,
+  `🚊 TRANSPORT`,
+  `🚗 DRIVE`,
+  `✈️ FLIGHT`,
+  `🏨 CHECK-IN`,
+  `🏛 SIGHTSEEING`,
+  `🍴 RESTAURANT`
+];
+
+export const ROUTE_POINT_TYPES_TIME_CHART = [
+  `🚕 TAXI`,
+  `🚌 BUS`,
+  `🚂 TRAIN`,
+  `🛳 SHIP`,
+  `🚊 TRANSPORT`,
+  `🚗 DRIVE`,
+  `✈️ FLIGHT`,
+  `🏨 CHECK-IN`,
+  `🏛 SIGHTSEEING`,
+  `🍴 RESTAURANT`
+];
+
+export const TRANSPORT_TYPES_CHART = [
+  `🚕 TAXI`,
+  `🚌 BUS`,
+  `🚂 TRAIN`,
+  `🚊 TRANSPORT`,
+  `🚗 DRIVE`,
+  `✈️ FLIGHT`
+];
+
 export const ROUTE_POINT_TYPES_FORM = {
   [`Transfer`]: [`Taxi`, `Bus`, `Train`, `Ship`, `Transport`, `Drive`, `Flight`],
   [`Activity`]: [`Check-in`, `Sightseeing`, `Restaurant`]
@@ -73,4 +108,12 @@ export const FilterType = {
   PAST: `past`
 };
 
-export const FILTERS = [`everything`, `future`, `past`];
+export const FILTERS = [
+  `everything`,
+  `future`,
+  `past`];
+export const MenuItem = {
+  NEW_EVENT: `New Event`,
+  TABLE: `Table`,
+  STATS: `Stats`
+};
