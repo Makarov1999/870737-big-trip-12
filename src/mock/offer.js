@@ -106,8 +106,8 @@ export const getOffersByType = (offers, type) => {
 
   return resultOffers;
 };
-export const setOffers = (routePointType) => {
-  const offers = OFFERS.filter((offer) => offer.type === routePointType);
+export const setOffers = (allOffers, routePointType) => {
+  const offers = allOffers.filter((offer) => offer.type === routePointType);
   if (offers.length === 0) {
     return [];
   } else {
