@@ -401,6 +401,8 @@ main {
   opacity: 0.89; }
   .trip-events__msg--hidden {
     display: none; }
+  .trip-events__msg--error {
+      color: #ff0000; }
 
 .trip-events__list {
   padding: 0;

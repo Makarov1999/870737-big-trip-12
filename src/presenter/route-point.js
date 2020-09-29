@@ -9,8 +9,10 @@ const Mode = {
 };
 
 export default class RoutePoint {
-  constructor(routePointContainer, changeData, changeMode, routePoint) {
+  constructor(routePointContainer, changeData, changeMode, routePoint, offers, destinations) {
     this._originalOffers = routePoint.offers.slice();
+    this._offers = offers;
+    this._destinations = destinations;
     this._routePointContainer = routePointContainer;
     this._changeData = changeData;
     this._changeMode = changeMode;
@@ -30,7 +32,7 @@ export default class RoutePoint {
     this._prevRoutePointComponent = this._routePointComponent;
     this._prevRoutePointFormComponent = this._routePointFormComponent;
     this._routePointComponent = new RoutePointView(routePoint);
-    this._routePointFormComponent = new FormView(routePoint);
+    this._routePointFormComponent = new FormView(this._offers, this._destinations, routePoint);
     this._routePointComponent.setClickHandler(this._handleClickHandler);
     this._routePointFormComponent.setSubmitHandler(this._handleSubmitHandler);
     this._routePointFormComponent.setResetHandler(this._handleResetHandler);

@@ -4,9 +4,10 @@ export default class Points extends Observer {
     super();
     this._points = [];
   }
-  setPoints(points) {
+  setPoints(updateType, points) {
     this._points = points;
     this._sortPoints();
+    this._notify(updateType, points);
   }
   getPoints() {
     return this._points;
@@ -48,5 +49,44 @@ export default class Points extends Observer {
   }
   _sortPoints() {
     this._points.sort((left, right) => left.startTime - right.finishTime);
+  }
+
+  static adaptToClient(point) {
+    const adaptedPoint = Object.assign(
+        {},
+        point,
+        {
+          // id: Number(point.id),
+          startTime: new Date(point.date_from),
+          finishTime: new Date(point.date_to),
+          cost: point.base_price,
+          isFavorite: point.is_favorite
+        }
+    );
+    delete adaptedPoint.date_from;
+    delete adaptedPoint.date_to;
+    delete adaptedPoint.base_price;
+    delete adaptedPoint.is_favorite;
+
+    return adaptedPoint;
+  }
+  static adaptToServer(point) {
+    const adaptedPoint = Object.assign(
+        {},
+        point,
+        {
+          "date_from": point.startTime.toString(),
+          "date_to": point.finishTime.toString(),
+          "base_price": point.cost,
+          "is_favorite": point.isFavorite
+        }
+    );
+
+    delete adaptedPoint.startTime;
+    delete adaptedPoint.finishTime;
+    delete adaptedPoint.cost;
+    delete adaptedPoint.isFavorite;
+
+    return adaptedPoint;
   }
 }

@@ -5,17 +5,17 @@ import {setDateToForm} from "../utils/date.js";
 import Smart from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
-import {OFFERS, isOfferChecked, getOffersByType} from "../mock/offer.js";
-import {DESTINATIONS, getCities, getDestination} from "../mock/destination.js";
-export const DEFAULT_POINT = {
-  type: ROUTE_POINT_TYPES[0],
-  destination: DESTINATIONS[0],
-  offers: [],
-  startTime: new Date(),
-  finishTime: new Date(),
-  cost: 0,
-  isFavorite: false
-};
+import {isOfferChecked, getOffersByType} from "../mock/offer.js";
+import {getCities, getDestination} from "../mock/destination.js";
+// export const DEFAULT_POINT = {
+//   type: ROUTE_POINT_TYPES[0],
+//   destination: null,
+//   offers: [],
+//   startTime: new Date(),
+//   finishTime: new Date(),
+//   cost: 0,
+//   isFavorite: false
+// };
 const createCitiesFormItems = (cities) => {
   let citiesFormTemlate = ``;
   cities.forEach((city) => {
@@ -41,13 +41,13 @@ const createEventFormTypeTemplate = (eventName, isChecked) => {
     </div>`
   );
 };
-const createDetailsSectionTemplate = (offers, destination, type) => {
-  if (!getOffersByType(OFFERS, type) > 0 && !destination.description) {
+const createDetailsSectionTemplate = (allOffers, offers, destination, type) => {
+  if (!getOffersByType(allOffers, type) > 0 && !destination.description) {
     return ``;
   } else {
     return (
       `<section class="event__details">
-        ${getOffersByType(OFFERS, type) ? createOffersSection(getOffersByType(OFFERS, type).offers, offers) : ``}
+        ${getOffersByType(allOffers, type) ? createOffersSection(getOffersByType(allOffers, type).offers, offers) : ``}
         ${destination.description ? createDestinationSection(destination) : ``}
        <section>`
     );
@@ -110,7 +110,9 @@ const createGroupsOfEventsFormTypeTemlate = (groups, checkedEvent = `Flight`) =>
   return groupsTemplate;
 };
 
-export const createFormMarksRouteTemplate = (routePoint) => {
+export const createFormMarksRouteTemplate = (routePoint, offersAll, destinations) => {
+  const OFFERS = offersAll;
+  const DESTINATIONS = destinations;
   if (routePoint) {
     const {type, destination, startTime, finishTime, cost, isFavorite, offers} = routePoint;
     const prepos = (type === `Check-in` || type === `Restaurant` || type === `Sightseeing`) ? `in` : `to`;
@@ -172,7 +174,7 @@ export const createFormMarksRouteTemplate = (routePoint) => {
           ${routePoint.id ? `<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>` : ``}
         </header>
 
-        ${createDetailsSectionTemplate(offers, destination, type)}
+        ${createDetailsSectionTemplate(OFFERS, offers, destination, type)}
       </form>`
     );
   } else {
@@ -227,9 +229,23 @@ export const createFormMarksRouteTemplate = (routePoint) => {
   }
 };
 export default class FormView extends Smart {
-  constructor(routePoint = DEFAULT_POINT) {
+  constructor(offers, destinations, routePoint) {
     super();
-    this._routePoint = routePoint;
+    if (!routePoint) {
+      this._routePoint = {
+        type: ROUTE_POINT_TYPES[0],
+        destination: destinations[0],
+        offers: getOffersByType(offers, ROUTE_POINT_TYPES[0]),
+        startTime: new Date(),
+        finishTime: new Date(),
+        cost: 0,
+        isFavorite: false
+      };
+    } else {
+      this._routePoint = routePoint;
+    }
+    this._offers = offers;
+    this._destinations = destinations;
     this._datepickerStart = null;
     this._datepickerFinish = null;
     this._submitHandler = this._submitHandler.bind(this);
@@ -249,7 +265,7 @@ export default class FormView extends Smart {
   }
 
   getTemplate() {
-    return createFormMarksRouteTemplate(this._routePoint);
+    return createFormMarksRouteTemplate(this._routePoint, this._offers, this._destinations);
   }
 
   getElement() {
@@ -365,12 +381,12 @@ export default class FormView extends Smart {
   }
   _destinationChangeHandler(evt) {
     evt.preventDefault();
-    if (!getCities(DESTINATIONS).includes(evt.target.value)) {
+    if (!getCities(this._destinations).includes(evt.target.value)) {
       evt.target.setCustomValidity(`Destination was not searched`);
     } else {
       evt.target.setCustomValidity(``);
       this.updateData({
-        destination: Object.assign({}, this._routePoint.destination, {name: evt.target.value, description: getDestination(DESTINATIONS, evt.target.value).description, pictures: getDestination(DESTINATIONS, evt.target.value).pictures})
+        destination: Object.assign({}, this._routePoint.destination, {name: evt.target.value, description: getDestination(this._destinations, evt.target.value).description, pictures: getDestination(this._destinations, evt.target.value).pictures})
       });
     }
   }
@@ -383,7 +399,7 @@ export default class FormView extends Smart {
   _offerChangeHandler(evt) {
     if (evt.target.checked) {
       const offers = this._routePoint.offers.slice();
-      offers.push({title: evt.target.value, price: evt.target.dataset.price});
+      offers.push({title: evt.target.value, price: Number(evt.target.dataset.price)});
       this.updateData({offers});
     } else {
       const offers = this._routePoint.offers.filter((offer) => offer.title !== evt.target.value);
