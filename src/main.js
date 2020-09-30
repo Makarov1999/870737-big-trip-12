@@ -20,9 +20,7 @@ const pointsModel = new Points();
 const filterModel = new Filter();
 const mainMenuComponent = new MainMenuView();
 const newEventButtonComponent = new NewEventButtonView();
-
 const filterPresenter = new FilterPresenter(mainTripFilterContainer, filterModel, pointsModel);
-
 const trip = new Trip(mainTripBlock, mainTripFilterContainer, eventsTripContainer, pointsModel, filterModel, api);
 const handleNewPointFormClose = () => {
   mainMenuComponent.getElement().querySelector(`[data-menu-item=${MenuItem.TABLE}]`).disabled = false;
@@ -60,20 +58,20 @@ const handleMainMenuChange = (menuItem) => {
   }
 };
 
-
 mainMenuComponent.setMenuClickHandler(handleMainMenuChange);
 newEventButtonComponent.setNewEventButtonClickHandler(handleMainMenuChange);
 render(mainTripBlock, newEventButtonComponent, ELEMENTS_POSITIONS.BEFOREEND);
 render(mainTripFilterContainer, mainMenuComponent, ELEMENTS_POSITIONS.AFTERBEGIN);
+newEventButtonComponent.getElement().disabled = true;
 trip.init();
+filterPresenter.init();
 Promise.all([api.getPoints(), api.getOffers(), api.getDestinations()])
  .then(([points, offers, destinations]) => {
    trip.destroy();
-   filterPresenter.init();
    trip.init(offers, destinations);
    pointsModel.setPoints(UpdateType.INIT, points);
+   newEventButtonComponent.getElement().disabled = false;
  })
 .catch(() => {
   pointsModel.setPoints(UpdateType.ERROR, []);
-  filterPresenter.init();
 });
