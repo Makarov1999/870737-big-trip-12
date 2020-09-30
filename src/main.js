@@ -35,7 +35,9 @@ const handleMainMenuChange = (menuItem) => {
   switch (menuItem) {
     case MenuItem.NEW_EVENT:
       mainMenuComponent.setMenuItem(MenuItem.TABLE);
-      remove(statisticsComponent);
+      if (statisticsComponent) {
+        remove(statisticsComponent);
+      }
       trip.destroy();
       filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       trip.init();
@@ -46,7 +48,9 @@ const handleMainMenuChange = (menuItem) => {
     case MenuItem.TABLE:
       mainMenuComponent.setMenuItem(MenuItem.TABLE);
       trip.init();
-      remove(statisticsComponent);
+      if (statisticsComponent) {
+        remove(statisticsComponent);
+      }
       break;
     case MenuItem.STATS:
       mainMenuComponent.setMenuItem(MenuItem.STATS);

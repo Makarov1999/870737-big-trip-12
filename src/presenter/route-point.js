@@ -8,6 +8,12 @@ const Mode = {
   EDITING: `EDITING`
 };
 
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`,
+};
+
 export default class RoutePoint {
   constructor(routePointContainer, changeData, changeMode, routePoint, offers, destinations) {
     this._originalOffers = routePoint.offers.slice();
@@ -47,6 +53,7 @@ export default class RoutePoint {
     }
     if (this._mode === Mode.EDITING) {
       replace(this._routePointFormComponent, this._prevRoutePointFormComponent);
+      this._mode = Mode.DEFAULT;
     }
     remove(this._prevRoutePointComponent);
     remove(this._prevRoutePointFormComponent);
@@ -58,6 +65,33 @@ export default class RoutePoint {
   resetView() {
     if (this._mode !== Mode.DEFAULT) {
       this._replaceFormToRoutePoint();
+    }
+  }
+  setViewState(state) {
+    const resetFormState = () => {
+      this._routePointFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+    switch (state) {
+      case State.SAVING:
+        this._routePointFormComponent.updateData({
+          isDisabled: true,
+          isSaving: true
+        });
+        break;
+      case State.DELETING:
+        this._routePointFormComponent.updateData({
+          isDisabled: true,
+          isDeleting: true
+        });
+        break;
+      case State.ABORTING:
+        this._routePointFormComponent.shake(resetFormState);
+        this._routePointFormComponent.shake(resetFormState);
+        break;
     }
   }
 
@@ -90,7 +124,7 @@ export default class RoutePoint {
   _handleSubmitHandler(routePoint) {
     this._originalOffers = routePoint.offers.slice();
     this._changeData(UserAction.UPDATE_POINT, this._currentUpdateType, routePoint);
-    this._replaceFormToRoutePoint();
+    // this._replaceFormToRoutePoint();
   }
   _handleResetHandler() {
     this._routePointFormComponent.reset(this._routePoint);
