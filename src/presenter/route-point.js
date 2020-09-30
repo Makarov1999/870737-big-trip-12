@@ -124,7 +124,6 @@ export default class RoutePoint {
   _handleSubmitHandler(routePoint) {
     this._originalOffers = routePoint.offers.slice();
     this._changeData(UserAction.UPDATE_POINT, this._currentUpdateType, routePoint);
-    // this._replaceFormToRoutePoint();
   }
   _handleResetHandler() {
     this._routePointFormComponent.reset(this._routePoint);

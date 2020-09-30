@@ -56,7 +56,6 @@ export default class Points extends Observer {
         {},
         point,
         {
-          // id: Number(point.id),
           startTime: new Date(point.date_from),
           finishTime: new Date(point.date_to),
           cost: point.base_price,
