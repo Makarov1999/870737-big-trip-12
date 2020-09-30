@@ -2,6 +2,13 @@ export const ELEMENTS_POSITIONS = {
   AFTERBEGIN: `afterbegin`,
   BEFOREEND: `beforeend`
 };
+
+export const State = {
+  SAVING: `SAVING`,
+  DELETING: `DELETING`,
+  ABORTING: `ABORTING`,
+};
+
 export const CAPTIONS_TEXT = {
   TRIP_VIEW: `Switch trip view`,
   FILTER: `Filter events`,

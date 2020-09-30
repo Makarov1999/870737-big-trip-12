@@ -17,10 +17,6 @@ export const render = (container, element, position) => {
   }
 };
 
-export const renderElement = (parent, template, position) => {
-  parent.insertAdjacentHTML(position, template);
-};
-
 export const replace = (newChild, oldChild) => {
   if (oldChild instanceof AbstractView) {
     oldChild = oldChild.getElement();

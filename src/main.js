@@ -1,7 +1,7 @@
 import Trip from "./presenter/trip.js";
 import Points from "./model/points.js";
 import Filter from "./model/filter.js";
-import FilterPresenter from "./presenter/filter.js";
+import FilterPresenter from "./presenter/filter-presenter.js";
 import MainMenuView from "./view/main-menu.js";
 import NewEventButtonView from "./view/new-event-button.js";
 import {render, remove} from "./utils/render.js";
@@ -21,7 +21,7 @@ const filterModel = new Filter();
 const mainMenuComponent = new MainMenuView();
 const newEventButtonComponent = new NewEventButtonView();
 const filterPresenter = new FilterPresenter(mainTripFilterContainer, filterModel, pointsModel);
-const trip = new Trip(mainTripBlock, mainTripFilterContainer, eventsTripContainer, pointsModel, filterModel, api);
+const trip = new Trip(mainTripFilterContainer, eventsTripContainer, pointsModel, filterModel, api);
 const handleNewPointFormClose = () => {
   mainMenuComponent.getElement().querySelector(`[data-menu-item=${MenuItem.TABLE}]`).disabled = false;
   newEventButtonComponent.getElement().disabled = false;

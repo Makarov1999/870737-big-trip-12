@@ -8,16 +8,15 @@ import NoRoutePointView from "../view/no-route-points.js";
 import LoadingView from "../view/loading.js";
 import ErrorView from "../view/error.js";
 import {filter} from "../utils/filter.js";
-import {ELEMENTS_POSITIONS, CAPTIONS_TEXT, SortType, UserAction, UpdateType, FILTERS, FilterType} from "../const.js";
+import {ELEMENTS_POSITIONS, CAPTIONS_TEXT, SortType, UserAction, UpdateType, FILTERS, FilterType, State as RoutePointPresenterViewState} from "../const.js";
 import {sortRoutePointsByPrice, sortRoutePointsByTime} from "../utils/sort.js";
 import {render, remove} from "../utils/render.js";
-import RoutePoint, {State as RoutePointPresenterViewState} from "./route-point.js";
+import RoutePoint from "./route-point.js";
 import RoutePointNew from "./route-point-new.js";
 import Points from "../model/points.js";
 
-export default class {
-  constructor(tripMainContainer, tripControlContainer, eventsTripContainer, points, filterModel, api) {
-    this._tripMainContainer = tripMainContainer;
+export default class Trip {
+  constructor(tripControlContainer, eventsTripContainer, points, filterModel, api) {
     this._points = points;
     this._filterModel = filterModel;
     this._api = api;
@@ -122,8 +121,8 @@ export default class {
       case UpdateType.MAJOR:
         this._currentSortType = SortType.DEFAULT;
         this._sortComponent.getElement().querySelector(`.trip-sort__item--event .trip-sort__input`).checked = true;
-        this._clearRoutePoints();
-        this._renderRoutePointsByDays(this._getPoints());
+        this._clearTrip();
+        this._renderTrip();
         break;
       case UpdateType.INIT:
         this._isLoading = false;
@@ -163,6 +162,9 @@ export default class {
     }
   }
   _renderNoRoutePoints() {
+    if (!this._noRoutePointComponent) {
+      this._noRoutePointComponent = new NoRoutePointView();
+    }
     render(this._eventsTripContainer, this._noRoutePointComponent, ELEMENTS_POSITIONS.BEFOREEND);
   }
   _renderLoading() {
@@ -223,6 +225,9 @@ export default class {
     }
     const routePoints = this._getPoints();
     if (routePoints.length > 0) {
+      if (this._noRoutePointComponent) {
+        remove(this._noRoutePointComponent);
+      }
       this._renderSort();
       this._renderRoutePointsByDays(routePoints);
 

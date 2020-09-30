@@ -55,7 +55,7 @@ export default class RoutePointNew {
   _handleSubmitHandler(routePoint) {
     this._changeData(
         UserAction.ADD_POINT,
-        UpdateType.MINOR,
+        UpdateType.MAJOR,
         routePoint
     );
   }

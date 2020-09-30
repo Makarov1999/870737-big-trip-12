@@ -1,17 +1,11 @@
 import FormView from "../view/form.js";
 import RoutePointView from "../view/route-point.js";
 import {render, replace, remove} from "../utils/render.js";
-import {ELEMENTS_POSITIONS, UserAction, UpdateType} from "../const.js";
+import {ELEMENTS_POSITIONS, UserAction, UpdateType, State} from "../const.js";
 
 const Mode = {
   DEFAULT: `DEFAULT`,
   EDITING: `EDITING`
-};
-
-export const State = {
-  SAVING: `SAVING`,
-  DELETING: `DELETING`,
-  ABORTING: `ABORTING`,
 };
 
 export default class RoutePoint {
@@ -135,7 +129,7 @@ export default class RoutePoint {
     this._replaceFormToRoutePoint();
   }
   _handleDeleteClick() {
-    this._changeData(UserAction.DELETE_POINT, UpdateType.MINOR, this._routePoint);
+    this._changeData(UserAction.DELETE_POINT, UpdateType.MAJOR, this._routePoint);
   }
 
   _handleFavoriteHandler() {
