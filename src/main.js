@@ -4,7 +4,6 @@ import Filter from "./model/filter.js";
 import FilterPresenter from "./presenter/filter.js";
 import MainMenuView from "./view/main-menu.js";
 import NewEventButtonView from "./view/new-event-button.js";
-import {renderTripInfo} from "./utils/trip-info.js";
 import {render, remove} from "./utils/render.js";
 import StatisticsView from "./view/statistics.js";
 import {ELEMENTS_POSITIONS, MenuItem, FilterType, UpdateType} from "./const.js";
@@ -35,7 +34,9 @@ const handleMainMenuChange = (menuItem) => {
   switch (menuItem) {
     case MenuItem.NEW_EVENT:
       mainMenuComponent.setMenuItem(MenuItem.TABLE);
-      remove(statisticsComponent);
+      if (statisticsComponent) {
+        remove(statisticsComponent);
+      }
       trip.destroy();
       filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
       trip.init();
@@ -46,7 +47,9 @@ const handleMainMenuChange = (menuItem) => {
     case MenuItem.TABLE:
       mainMenuComponent.setMenuItem(MenuItem.TABLE);
       trip.init();
-      remove(statisticsComponent);
+      if (statisticsComponent) {
+        remove(statisticsComponent);
+      }
       break;
     case MenuItem.STATS:
       mainMenuComponent.setMenuItem(MenuItem.STATS);
@@ -60,7 +63,8 @@ const handleMainMenuChange = (menuItem) => {
 
 mainMenuComponent.setMenuClickHandler(handleMainMenuChange);
 newEventButtonComponent.setNewEventButtonClickHandler(handleMainMenuChange);
-
+render(mainTripBlock, newEventButtonComponent, ELEMENTS_POSITIONS.BEFOREEND);
+render(mainTripFilterContainer, mainMenuComponent, ELEMENTS_POSITIONS.AFTERBEGIN);
 trip.init();
 Promise.all([api.getPoints(), api.getOffers(), api.getDestinations()])
  .then(([points, offers, destinations]) => {
@@ -68,14 +72,8 @@ Promise.all([api.getPoints(), api.getOffers(), api.getDestinations()])
    filterPresenter.init();
    trip.init(offers, destinations);
    pointsModel.setPoints(UpdateType.INIT, points);
-   render(mainTripBlock, newEventButtonComponent, ELEMENTS_POSITIONS.BEFOREEND);
-   render(mainTripFilterContainer, mainMenuComponent, ELEMENTS_POSITIONS.AFTERBEGIN);
-   renderTripInfo(mainTripBlock, pointsModel.getPoints());
  })
 .catch(() => {
   pointsModel.setPoints(UpdateType.ERROR, []);
   filterPresenter.init();
-  render(mainTripBlock, newEventButtonComponent, ELEMENTS_POSITIONS.BEFOREEND);
-  render(mainTripFilterContainer, mainMenuComponent, ELEMENTS_POSITIONS.AFTERBEGIN);
-  renderTripInfo(mainTripBlock, pointsModel.getPoints());
 });

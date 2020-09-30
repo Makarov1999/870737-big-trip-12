@@ -1,21 +1,12 @@
-import {ROUTE_POINT_TYPES_FORM, ROUTE_POINT_TYPES} from "../const.js";
-import {ROUTE_POINT_GROUPS} from "../const.js";
+import {ROUTE_POINT_TYPES_FORM, ROUTE_POINT_TYPES, ROUTE_POINT_GROUPS} from "../const.js";
 import {createElement} from "../utils/common.js";
 import {setDateToForm} from "../utils/date.js";
 import Smart from "./smart.js";
 import flatpickr from "flatpickr";
 import "../../node_modules/flatpickr/dist/flatpickr.min.css";
-import {isOfferChecked, getOffersByType} from "../mock/offer.js";
-import {getCities, getDestination} from "../mock/destination.js";
-// export const DEFAULT_POINT = {
-//   type: ROUTE_POINT_TYPES[0],
-//   destination: null,
-//   offers: [],
-//   startTime: new Date(),
-//   finishTime: new Date(),
-//   cost: 0,
-//   isFavorite: false
-// };
+import {isOfferChecked, getOffersByType} from "../utils/offer.js";
+import {getCities, getDestination} from "../utils/destination.js";
+
 const createCitiesFormItems = (cities) => {
   let citiesFormTemlate = ``;
   cities.forEach((city) => {
@@ -41,13 +32,13 @@ const createEventFormTypeTemplate = (eventName, isChecked) => {
     </div>`
   );
 };
-const createDetailsSectionTemplate = (allOffers, offers, destination, type) => {
-  if (!getOffersByType(allOffers, type) > 0 && !destination.description) {
+const createDetailsSectionTemplate = (allOffers, offers, destination, type, isDisabled) => {
+  if (!getOffersByType(allOffers, type).offers.length > 0 && !destination.description) {
     return ``;
   } else {
     return (
       `<section class="event__details">
-        ${getOffersByType(allOffers, type) ? createOffersSection(getOffersByType(allOffers, type).offers, offers) : ``}
+        ${getOffersByType(allOffers, type).offers.length > 0 ? createOffersSection(getOffersByType(allOffers, type).offers, offers, isDisabled) : ``}
         ${destination.description ? createDestinationSection(destination) : ``}
        <section>`
     );
@@ -62,10 +53,10 @@ const createDestinationSection = (destination) => {
     </section>`
   );
 };
-const createOfferFormTemplate = (offer, isChecked) => {
+const createOfferFormTemplate = (offer, isChecked, isDisabled) => {
   return (
     `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" value="${offer.title}" id="event-offer-${offer.title.toLowerCase()}-1" type="checkbox" data-price="${offer.price}" name="event-offer-${offer.title.toLowerCase()}" ${isChecked ? `checked` : ``}>
+        <input class="event__offer-checkbox  visually-hidden" value="${offer.title}" id="event-offer-${offer.title.toLowerCase()}-1" type="checkbox" data-price="${offer.price}" name="event-offer-${offer.title.toLowerCase()}" ${isChecked ? `checked` : ``} ${isDisabled ? `disabled` : ``}>
         <label class="event__offer-label" for="event-offer-${offer.title.toLowerCase()}-1">
           <span class="event__offer-title">${offer.title}</span>
           &plus;
@@ -75,13 +66,13 @@ const createOfferFormTemplate = (offer, isChecked) => {
   );
 };
 
-const createOffersSection = (offers, checkedOffers) => {
+const createOffersSection = (offers, checkedOffers, isDisabled) => {
   let offersTemplate = ``;
   offers.forEach((offer) => {
     if (isOfferChecked(checkedOffers, offer)) {
-      offersTemplate += createOfferFormTemplate(offer, true);
+      offersTemplate += createOfferFormTemplate(offer, true, isDisabled);
     } else {
-      offersTemplate += createOfferFormTemplate(offer, false);
+      offersTemplate += createOfferFormTemplate(offer, false, isDisabled);
     }
   });
   return (
@@ -110,21 +101,28 @@ const createGroupsOfEventsFormTypeTemlate = (groups, checkedEvent = `Flight`) =>
   return groupsTemplate;
 };
 
-export const createFormMarksRouteTemplate = (routePoint, offersAll, destinations) => {
+export const createFormMarksRouteTemplate = (data, offersAll, destinations) => {
   const OFFERS = offersAll;
   const DESTINATIONS = destinations;
-  if (routePoint) {
-    const {type, destination, startTime, finishTime, cost, isFavorite, offers} = routePoint;
-    const prepos = (type === `Check-in` || type === `Restaurant` || type === `Sightseeing`) ? `in` : `to`;
-    return (
-      `<form class="trip-events__item  event  event--edit" action="#" method="post">
+  const {type, destination, startTime, finishTime, cost, isFavorite, offers, isDisabled, isDeleting, isSaving} = data;
+  let deletingButtonValue = ``;
+  if (!data.id) {
+    deletingButtonValue = `Cancel`;
+  } else if (isDeleting) {
+    deletingButtonValue = `Deleting`;
+  } else {
+    deletingButtonValue = `Delete`;
+  }
+  const prepos = (type === `Check-in` || type === `Restaurant` || type === `Sightseeing`) ? `in` : `to`;
+  return (
+    `<form class="trip-events__item  event  event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
               <img class="event__type-icon" width="17" height="17" src="img/icons/${type.toLowerCase()}.png" alt="Event type icon">
             </label>
-            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+            <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? `disabled` : ``}>
 
             <div class="event__type-list">
               ${createGroupsOfEventsFormTypeTemlate(ROUTE_POINT_GROUPS, type)}
@@ -135,7 +133,7 @@ export const createFormMarksRouteTemplate = (routePoint, offersAll, destinations
             <label class="event__label  event__type-output" for="event-destination-1">
               ${type.substring(0, 1).toUpperCase() + type.substring(1)} ${prepos}
             </label>
-            <input class="event__input  event__input--destination" id="event-destination-1" data-type="city" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+            <input class="event__input  event__input--destination" id="event-destination-1" data-type="city" type="text" name="event-destination" value="${destination.name}" list="destination-list-1" ${isDisabled ? `disabled` : ``}>
             <datalist id="destination-list-1">
               ${createCitiesFormItems(getCities(DESTINATIONS))}
             </datalist>
@@ -145,12 +143,12 @@ export const createFormMarksRouteTemplate = (routePoint, offersAll, destinations
             <label class="visually-hidden" for="event-start-time-1">
               From
             </label>
-            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${setDateToForm(startTime)}" data-date="${startTime}">
+            <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${setDateToForm(startTime)}" data-date="${startTime}" ${isDisabled ? `disabled` : ``}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">
               To
             </label>
-            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${setDateToForm(finishTime)}" data-date="${finishTime}">
+            <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${setDateToForm(finishTime)}" data-date="${finishTime}" ${isDisabled ? `disabled` : ``}>
           </div>
 
           <div class="event__field-group  event__field-group--price">
@@ -158,12 +156,12 @@ export const createFormMarksRouteTemplate = (routePoint, offersAll, destinations
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input  event__input--price" id="event-price-1" data-type="cost" type="text" name="event-price" value="${cost}">
+            <input class="event__input  event__input--price" id="event-price-1" data-type="cost" type="text" name="event-price" value="${cost}" ${isDisabled ? `disabled` : ``}>
           </div>
 
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">${routePoint.id ? `Delete` : `Cancel`}</button>
-          ${routePoint.id ? `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
+          <button class="event__save-btn  btn  btn--blue" type="submit">${isSaving ? `Saving` : `Save`}</button>
+          <button class="event__reset-btn" type="reset">${deletingButtonValue}</button>
+          ${data.id ? `<input id="event-favorite-1" class="event__favorite-checkbox  visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
           <label class="event__favorite-btn" for="event-favorite-1">
             <span class="visually-hidden">Add to favorite</span>
             <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
@@ -171,62 +169,12 @@ export const createFormMarksRouteTemplate = (routePoint, offersAll, destinations
             </svg>
           </label>` : ``}
 
-          ${routePoint.id ? `<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>` : ``}
+          ${data.id ? `<button class="event__rollup-btn" type="button"><span class="visually-hidden">Open event</span></button>` : ``}
         </header>
 
-        ${createDetailsSectionTemplate(OFFERS, offers, destination, type)}
+        ${createDetailsSectionTemplate(OFFERS, offers, destination, type, isDisabled)}
       </form>`
-    );
-  } else {
-    return (`<form class="trip-events__item  event  event--edit" action="#" method="post">
-      <header class="event__header">
-        <div class="event__type-wrapper">
-          <label class="event__type  event__type-btn" for="event-type-toggle-1">
-            <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/bus.png" alt="Event type icon">
-          </label>
-          <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-
-          <div class="event__type-list">
-            ${createGroupsOfEventsFormTypeTemlate(ROUTE_POINT_GROUPS)}
-          </div>
-        </div>
-
-        <div class="event__field-group  event__field-group--destination">
-          <label class="event__label  event__type-output" for="event-destination-1">
-            Bus to
-          </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="" list="destination-list-1">
-          <datalist id="destination-list-1">
-            ${createCitiesFormItems(getCities(DESTINATIONS))}
-          </datalist>
-        </div>
-
-        <div class="event__field-group  event__field-group--time">
-          <label class="visually-hidden" for="event-start-time-1">
-            From
-          </label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${setDateToForm(new Date())}">
-          &mdash;
-          <label class="visually-hidden" for="event-end-time-1">
-            To
-          </label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${setDateToForm(new Date())}">
-        </div>
-
-        <div class="event__field-group  event__field-group--price">
-          <label class="event__label" for="event-price-1">
-            <span class="visually-hidden">Price</span>
-            &euro;
-          </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="">
-        </div>
-
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
-      </header>
-    </form>`);
-  }
+  );
 };
 export default class FormView extends Smart {
   constructor(offers, destinations, routePoint) {
@@ -235,7 +183,7 @@ export default class FormView extends Smart {
       this._routePoint = {
         type: ROUTE_POINT_TYPES[0],
         destination: destinations[0],
-        offers: getOffersByType(offers, ROUTE_POINT_TYPES[0]),
+        offers: [],
         startTime: new Date(),
         finishTime: new Date(),
         cost: 0,
@@ -244,6 +192,7 @@ export default class FormView extends Smart {
     } else {
       this._routePoint = routePoint;
     }
+    this._data = FormView.parsePointToData(this._routePoint);
     this._offers = offers;
     this._destinations = destinations;
     this._datepickerStart = null;
@@ -265,7 +214,7 @@ export default class FormView extends Smart {
   }
 
   getTemplate() {
-    return createFormMarksRouteTemplate(this._routePoint, this._offers, this._destinations);
+    return createFormMarksRouteTemplate(this._data, this._offers, this._destinations);
   }
 
   getElement() {
@@ -282,10 +231,28 @@ export default class FormView extends Smart {
       this.getElement().querySelector(`.event__available-offers`).addEventListener(`change`, this._offerChangeHandler);
     }
   }
+  static parsePointToData(routePoint) {
+    return Object.assign(
+        {},
+        routePoint,
+        {
+          isDisabled: false,
+          isSaving: false,
+          isDeleting: false
+        }
+    );
+  }
+  static parseDataToPoint(data) {
+    Object.assign({}, data);
+    delete data.isDisabled;
+    delete data.isSaving;
+    delete data.isDeleting;
+    return data;
+  }
   restoreHandlers() {
     this.setSubmitHandler(this._callback.submit);
     this.setDeleteHandler(this._callback.deleteClick);
-    if (this._routePoint.id) {
+    if (this._data.id) {
       this.setResetHandler(this._callback.resetClick);
     }
     this._setDatePickerStart();
@@ -293,7 +260,9 @@ export default class FormView extends Smart {
     this._setInnerHandlers();
   }
   reset(routePoint) {
-    this.updateData(routePoint);
+    this.updateData(
+        FormView.parsePointToData(routePoint)
+    );
   }
   _setDatePickerStart() {
     if (this._datepickerStart) {
@@ -304,7 +273,7 @@ export default class FormView extends Smart {
         this.getElement().querySelector(`#event-start-time-1`),
         {
           dateFormat: `d/m/y H:i`,
-          defaultDate: this._routePoint.startTime,
+          defaultDate: this._data.startTime,
           onChange: this._startDateChangeHandler,
           enableTime: true,
         }
@@ -319,7 +288,7 @@ export default class FormView extends Smart {
         this.getElement().querySelector(`#event-end-time-1`),
         {
           dateFormat: `d/m/y H:i`,
-          defaultDate: this._routePoint.finishTime,
+          defaultDate: this._data.finishTime,
           onChange: this._finishDateChangeHandler,
           enableTime: true,
         }
@@ -327,7 +296,7 @@ export default class FormView extends Smart {
   }
   _startDateChangeHandler(selectedDates) {
     const startDate = selectedDates[0];
-    if (startDate > this._routePoint.finishTime) {
+    if (startDate > this._data.finishTime) {
       this.getElement().querySelector(`.event__save-btn`).disabled = true;
     } else {
       this.getElement().querySelector(`.event__save-btn`).disabled = false;
@@ -338,7 +307,7 @@ export default class FormView extends Smart {
   }
   _finishDateChangeHandler(selectedDates) {
     const finishDate = selectedDates[0];
-    if (finishDate < this._routePoint.startTime) {
+    if (finishDate < this._data.startTime) {
       this.getElement().querySelector(`.event__save-btn`).disabled = true;
     } else {
       this.getElement().querySelector(`.event__save-btn`).disabled = false;
@@ -349,7 +318,7 @@ export default class FormView extends Smart {
   }
   _submitHandler(evt) {
     evt.preventDefault();
-    this._callback.submit(this._routePoint);
+    this._callback.submit(FormView.parseDataToPoint(this._data));
   }
   _deleteHandler(evt) {
     evt.preventDefault();
@@ -398,11 +367,11 @@ export default class FormView extends Smart {
   }
   _offerChangeHandler(evt) {
     if (evt.target.checked) {
-      const offers = this._routePoint.offers.slice();
+      const offers = this._data.offers.slice();
       offers.push({title: evt.target.value, price: Number(evt.target.dataset.price)});
       this.updateData({offers});
     } else {
-      const offers = this._routePoint.offers.filter((offer) => offer.title !== evt.target.value);
+      const offers = this._data.offers.filter((offer) => offer.title !== evt.target.value);
       this.updateData({offers});
     }
   }

@@ -22,10 +22,10 @@ export const createRoutePointTemplate = (routePoint) => {
   const routePointTimeStop = finishTime.toLocaleString(`ru-RU`, {hour: `numeric`, minute: `numeric`});
   const duration = getDurationInDates(startTime, finishTime);
   let offersTemplate = ``;
-  offers.forEach((offer) => {
-    const offerElement = createOfferTemplate(offer);
+  for (let i = 0; i < Math.min(offers.length, 3); i++) {
+    const offerElement = createOfferTemplate(offers[i]);
     offersTemplate += offerElement;
-  });
+  }
   return (
     `<li class="trip-events__item">
       <div class="event">

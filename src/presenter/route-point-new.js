@@ -1,10 +1,11 @@
-import {generateId} from "../mock/route-point.js";
 import FormView from "../view/form.js";
 import {remove, render} from "../utils/render.js";
 import {ELEMENTS_POSITIONS, UserAction, UpdateType} from "../const.js";
 
 export default class RoutePointNew {
-  constructor(routePointContainer, changeData) {
+  constructor(routePointContainer, changeData, offers, destinations) {
+    this._offers = offers;
+    this._destinations = destinations;
     this._routePointContainer = routePointContainer;
     this._changeData = changeData;
     this._routePointFormComponent = null;
@@ -17,7 +18,7 @@ export default class RoutePointNew {
     if (this._routePointFormComponent !== null) {
       return;
     }
-    this._routePointFormComponent = new FormView();
+    this._routePointFormComponent = new FormView(this._offers, this._destinations);
     this._routePointFormComponent.setSubmitHandler(this._handleSubmitHandler);
     this._routePointFormComponent.setDeleteHandler(this._handleDeleteClick);
     render(this._routePointContainer, this._routePointFormComponent, ELEMENTS_POSITIONS.AFTERBEGIN);
@@ -34,11 +35,28 @@ export default class RoutePointNew {
     this._routePointFormComponent = null;
     document.removeEventListener(`keydown`, this._escKeyDownHandler);
   }
+  setSaving() {
+    this._routePointFormComponent.updateData({
+      isDisabled: true,
+      isSaving: true
+    });
+  }
+  setAborting() {
+    const resetFormState = () => {
+      this._routePointFormComponent.updateData({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+
+    this._routePointFormComponent.shake(resetFormState);
+  }
   _handleSubmitHandler(routePoint) {
     this._changeData(
         UserAction.ADD_POINT,
         UpdateType.MINOR,
-        Object.assign({id: generateId()}, routePoint)
+        routePoint
     );
   }
   _handleDeleteClick() {

@@ -11,7 +11,7 @@ import {filter} from "../utils/filter.js";
 import {ELEMENTS_POSITIONS, CAPTIONS_TEXT, SortType, UserAction, UpdateType, FILTERS, FilterType} from "../const.js";
 import {sortRoutePointsByPrice, sortRoutePointsByTime} from "../utils/sort.js";
 import {render, remove} from "../utils/render.js";
-import RoutePoint from "./route-point.js";
+import RoutePoint, {State as RoutePointPresenterViewState} from "./route-point.js";
 import RoutePointNew from "./route-point-new.js";
 import Points from "../model/points.js";
 
@@ -36,13 +36,14 @@ export default class {
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
-
-    this._routePointNewPresenter = new RoutePointNew(this._eventsTripContainer, this._handleViewAction);
   }
 
   init(offers = [], destinations = []) {
-    this._offers = offers;
-    this._destinations = destinations;
+    if (offers.length > 0 || destinations.length > 0) {
+      this._offers = offers;
+      this._destinations = destinations;
+    }
+    this._routePointNewPresenter = new RoutePointNew(this._eventsTripContainer, this._handleViewAction, this._offers, this._destinations);
     render(this._tripControlContainer, new CaptionView(CAPTIONS_TEXT.TRIP_VIEW), ELEMENTS_POSITIONS.AFTERBEGIN);
     render(this._tripControlContainer, new CaptionView(CAPTIONS_TEXT.FILTER), ELEMENTS_POSITIONS.BEFOREEND);
     render(this._eventsTripContainer, new CaptionView(CAPTIONS_TEXT.EVENT), ELEMENTS_POSITIONS.AFTERBEGIN);
@@ -74,15 +75,34 @@ export default class {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this._api.updatePoint(update).then((response) => {
+        this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.SAVING);
+        this._api.updatePoint(update)
+        .then((response) => {
           this._points.updatePoint(updateType, Points.adaptToClient(response));
+        })
+        .catch(() => {
+          this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
         });
         break;
       case UserAction.ADD_POINT:
-        this._points.addPoint(updateType, update);
+        this._routePointNewPresenter.setSaving();
+        this._api.addPoint(update)
+        .then((response) => {
+          this._points.addPoint(updateType, response);
+        })
+        .catch(() => {
+          this._routePointNewPresenter.setAborting();
+        });
         break;
       case UserAction.DELETE_POINT:
-        this._points.deletePoint(updateType, update);
+        this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.DELETING);
+        this._api.deletePoint(update)
+        .then(() => {
+          this._points.deletePoint(updateType, update);
+        })
+        .catch(() => {
+          this._routePointPresenter[update.id].setViewState(RoutePointPresenterViewState.ABORTING);
+        });
         break;
     }
   }
