@@ -33,12 +33,12 @@ const createEventFormTypeTemplate = (eventName, isChecked) => {
   );
 };
 const createDetailsSectionTemplate = (allOffers, offers, destination, type, isDisabled) => {
-  if (!getOffersByType(allOffers, type) > 0 && !destination.description) {
+  if (!getOffersByType(allOffers, type).offers.length > 0 && !destination.description) {
     return ``;
   } else {
     return (
       `<section class="event__details">
-        ${getOffersByType(allOffers, type) ? createOffersSection(getOffersByType(allOffers, type).offers, offers, isDisabled) : ``}
+        ${getOffersByType(allOffers, type).offers.length > 0 ? createOffersSection(getOffersByType(allOffers, type).offers, offers, isDisabled) : ``}
         ${destination.description ? createDestinationSection(destination) : ``}
        <section>`
     );
